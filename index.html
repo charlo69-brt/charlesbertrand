@@ -296,17 +296,40 @@ display:flex; align-items:center; justify-content:center; font-size:22px; margin
 .skills-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
 .skills-card {
 background:#fff; border:1px solid var(–border); border-radius:var(–radius);
-padding:26px 24px; transition:box-shadow .25s;
+padding:26px 24px; transition:box-shadow .25s, border-color .25s;
 }
-.skills-card:hover { box-shadow:var(–shadow); }
-.skills-card-title { font-size:14px; font-weight:700; color:var(–text); margin-bottom:20px; }
-.skill-row { margin-bottom:14px; }
+.skills-card:hover { box-shadow:var(–shadow-lg); border-color:rgba(30,58,138,.2); }
+.skills-card-title {
+font-size:14px; font-weight:700; color:var(–text); margin-bottom:22px;
+display:flex; align-items:center; gap:8px;
+}
+.skills-card-title::before { content:’’; display:block; width:3px; height:16px; background:var(–blue); border-radius:2px; }
+.skill-row { margin-bottom:18px; }
 .skill-row:last-child { margin-bottom:0; }
-.skill-info { display:flex; justify-content:space-between; margin-bottom:6px; }
-.skill-name { font-size:13.5px; color:var(–text-mid); font-weight:400; }
-.skill-pct { font-size:13px; color:var(–blue); font-weight:600; }
-.skill-track { height:5px; background:var(–bg-soft); border-radius:99px; overflow:hidden; }
-.skill-fill { height:100%; background:linear-gradient(90deg,var(–blue),var(–blue-mid)); border-radius:99px; width:0%; transition:width 1.2s var(–ease); }
+.skill-info { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.skill-name { font-size:13.5px; color:var(–text-mid); font-weight:500; }
+.skill-pct { font-size:12px; color:var(–blue); font-weight:700; background:var(–blue-light); padding:2px 9px; border-radius:99px; }
+.skill-track {
+height:10px; background:var(–bg-soft); border-radius:99px; overflow:hidden;
+border:1px solid var(–border); position:relative;
+}
+.skill-fill {
+height:100%; border-radius:99px; width:0%;
+transition:width 1.4s var(–ease);
+position:relative; overflow:hidden;
+}
+.skill-fill::after {
+content:’’; position:absolute; top:0; left:-100%; width:100%; height:100%;
+background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+animation:shimmer 2.2s 1.5s infinite;
+}
+.skill-fill.blue  { background:linear-gradient(90deg,#1E3A8A,#3B82F6); }
+.skill-fill.teal  { background:linear-gradient(90deg,#0F766E,#14B8A6); }
+.skill-fill.amber { background:linear-gradient(90deg,#92400E,#F59E0B); }
+.skill-fill.green { background:linear-gradient(90deg,#166534,#22C55E); }
+.skill-fill.purple{ background:linear-gradient(90deg,#5B21B6,#8B5CF6); }
+.skill-fill.rose  { background:linear-gradient(90deg,#9F1239,#F43F5E); }
+@keyframes shimmer { 0%{left:-100%} 100%{left:200%} }
 
 /* ── LANGUES & INTERETS ── */
 #apropos2 { background:var(–bg-soft); }
@@ -392,6 +415,96 @@ padding:32px 48px; display:flex; justify-content:space-between; align-items:cent
 .rev.vis { opacity:1; transform:translateY(0); }
 .d1{transition-delay:.08s}.d2{transition-delay:.18s}.d3{transition-delay:.28s}.d4{transition-delay:.38s}
 
+/* ── TOOLTIP SYSTEM ── */
+[data-tip] { position:relative; }
+[data-tip]::after {
+content: attr(data-tip);
+position:absolute; bottom:calc(100% + 12px); left:50%; transform:translateX(-50%) translateY(6px);
+background:var(–text); color:#fff; font-size:12px; font-weight:400; line-height:1.5;
+padding:8px 13px; border-radius:9px; white-space:nowrap; pointer-events:none;
+opacity:0; transition:opacity .25s var(–ease), transform .25s var(–ease);
+box-shadow:0 4px 16px rgba(0,0,0,.2); z-index:500; max-width:220px; white-space:normal; text-align:center;
+font-family:‘Inter’,sans-serif;
+}
+[data-tip]::before {
+content:’’; position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%) translateY(6px);
+border:5px solid transparent; border-top-color:var(–text);
+opacity:0; transition:opacity .25s var(–ease), transform .25s var(–ease); pointer-events:none; z-index:501;
+}
+[data-tip]:hover::after { opacity:1; transform:translateX(-50%) translateY(0); }
+[data-tip]:hover::before { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ── HOVER INFO CARD (flottant) ── */
+.info-card {
+position:absolute; z-index:400; background:#fff;
+border:1.5px solid rgba(30,58,138,.2); border-radius:14px;
+padding:18px 20px; box-shadow:0 12px 40px rgba(0,0,0,.14);
+width:260px; pointer-events:none;
+opacity:0; transform:translateY(8px) scale(.97);
+transition:opacity .3s var(–ease), transform .3s var(–ease);
+}
+.info-card.show { opacity:1; transform:translateY(0) scale(1); }
+.info-card-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(–blue); margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+.info-card-body { font-size:13px; color:var(–text-mid); line-height:1.65; }
+.info-card-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.info-card-tag { font-size:11px; background:var(–blue-light); color:var(–blue-mid); padding:3px 10px; border-radius:99px; font-weight:500; }
+
+/* ── STAT HOVER ── */
+.hstat-wrap { position:relative; cursor:default; padding:4px 8px; border-radius:10px; transition:background .2s; }
+.hstat-wrap:hover { background:var(–blue-light); }
+
+/* ── ENHANCED CARD HOVERS ── */
+.exp-card .exp-hover-detail {
+max-height:0; overflow:hidden;
+transition:max-height .4s var(–ease), opacity .3s;
+opacity:0; font-size:12.5px; color:var(–text-soft); line-height:1.6; margin-top:0;
+}
+.exp-card:hover .exp-hover-detail { max-height:80px; opacity:1; margin-top:12px; }
+
+.tl-card .tl-hover-tag {
+display:inline-flex; align-items:center; gap:5px;
+font-size:11px; background:var(–blue-light); color:var(–blue);
+padding:3px 10px; border-radius:99px; margin-top:10px;
+opacity:0; transform:translateX(-8px);
+transition:opacity .3s var(–ease), transform .3s var(–ease);
+}
+.tl-card:hover .tl-hover-tag { opacity:1; transform:translateX(0); }
+
+.real-card .real-hover-more {
+font-size:12.5px; color:var(–blue); font-weight:500;
+margin-top:10px; opacity:0; transform:translateY(4px);
+transition:opacity .3s, transform .3s var(–ease);
+display:flex; align-items:center; gap:5px;
+}
+.real-card:hover .real-hover-more { opacity:1; transform:translateY(0); }
+
+.lang-card .lang-hover {
+font-size:12px; color:var(–blue); margin-top:6px;
+opacity:0; transform:translateY(4px);
+transition:opacity .25s, transform .25s var(–ease);
+}
+.lang-card:hover .lang-hover { opacity:1; transform:translateY(0); }
+
+.chip .chip-hover-txt { display:none; }
+.chip-active { background:var(–blue-light) !important; border-color:var(–blue) !important; color:var(–blue) !important; }
+
+/* ── FORM FIELD FOCUS LABEL ── */
+.f-field .f-hint {
+font-size:11.5px; color:var(–blue); margin-top:5px;
+opacity:0; transform:translateY(-4px);
+transition:opacity .25s, transform .25s;
+}
+.f-inp:focus ~ .f-hint { opacity:1; transform:translateY(0); }
+
+/* ── CHAR CARD EXPANDED ── */
+.char-card .char-more {
+font-size:12px; color:var(–blue-mid); margin-top:6px;
+max-height:0; overflow:hidden;
+transition:max-height .35s var(–ease), opacity .3s;
+opacity:0;
+}
+.char-card:hover .char-more { max-height:40px; opacity:1; }
+
 /* ── ANIMATIONS ── */
 @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.4)} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0)} }
 
@@ -463,7 +576,7 @@ footer{flex-direction:column;gap:16px;text-align:center}
     <div class="hero-contacts">
       <div class="hero-contact-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Bertrand.charles.pro@gmail.com
+        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d99bbcabadabb8b7bdf7bab1b8abb5bcaaf7a9abb699beb4b8b0b5f7bab6b4">[email&#160;protected]</a>
       </div>
       <div class="hero-contact-item">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 8.67 19.79 19.79 0 01.06 4a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 9.91a16 16 0 006.18 6.18l.91-.91a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
@@ -479,9 +592,15 @@ footer{flex-direction:column;gap:16px;text-align:center}
       <a href="#about" class="btn-secondary">En savoir plus</a>
     </div>
     <div class="hero-stats">
-      <div><div class="hstat-n" data-count="1" data-suffix="er">1er</div><div class="hstat-l">Concours Négociation</div></div>
-      <div><div class="hstat-n" data-count="4" data-suffix="+">4+</div><div class="hstat-l">Ans d'expérience</div></div>
-      <div><div class="hstat-n" data-count="3" data-suffix="">3</div><div class="hstat-l">Secteurs maîtrisés</div></div>
+      <div class="hstat-wrap" data-tip="1ère place sur 60 participants — Journée de la Négociation 2023">
+        <div class="hstat-n">1er</div><div class="hstat-l">Concours Négociation</div>
+      </div>
+      <div class="hstat-wrap" data-tip="De 2021 (Century 21) à aujourd'hui (LCL + Master) — 3 secteurs, 4 contrats">
+        <div class="hstat-n">4+</div><div class="hstat-l">Ans d'expérience</div>
+      </div>
+      <div class="hstat-wrap" data-tip="Immobilier · Banque & Patrimoine · Marketing Digital & IA">
+        <div class="hstat-n">3</div><div class="hstat-l">Secteurs maîtrisés</div>
+      </div>
     </div>
   </div>
   <div class="hero-photo">
@@ -516,10 +635,10 @@ footer{flex-direction:column;gap:16px;text-align:center}
     <div>
       <h3 class="rev d2">Ce qui me caractérise</h3>
       <div class="char-cards">
-        <div class="char-card rev d2"><div class="char-ico">🎯</div><div><div class="char-title">Réorientation Stratégique</div><div class="char-sub">Passage du général au professionnel par choix et détermination</div></div></div>
-        <div class="char-card rev d3"><div class="char-ico">💡</div><div><div class="char-title">Autodidacte Digital</div><div class="char-sub">Compétences web, design et IA développées en autonomie</div></div></div>
-        <div class="char-card rev d3"><div class="char-ico">⚡</div><div><div class="char-title">Dynamique & Innovant</div><div class="char-sub">Toujours à l'affût des nouvelles tendances et technologies</div></div></div>
-        <div class="char-card rev d4"><div class="char-ico">📚</div><div><div class="char-title">Soif d'Apprendre</div><div class="char-sub">Formation continue et développement des compétences</div></div></div>
+        <div class="char-card rev d2"><div class="char-ico">🎯</div><div><div class="char-title">Réorientation Stratégique</div><div class="char-sub">Passage du général au professionnel par choix et détermination</div><div class="char-more">Filière générale → Bac Pro → BTS → Licence → Master</div></div></div>
+        <div class="char-card rev d3"><div class="char-ico">💡</div><div><div class="char-title">Autodidacte Digital</div><div class="char-sub">Compétences web, design et IA développées en autonomie</div><div class="char-more">Photoshop · Canva · WordPress · Outils IA · Ce site</div></div></div>
+        <div class="char-card rev d3"><div class="char-ico">⚡</div><div><div class="char-title">Dynamique & Innovant</div><div class="char-sub">Toujours à l'affût des nouvelles tendances et technologies</div><div class="char-more">Veille active sur les marchés, la tech et le branding</div></div></div>
+        <div class="char-card rev d4"><div class="char-ico">📚</div><div><div class="char-title">Soif d'Apprendre</div><div class="char-sub">Formation continue et développement des compétences</div><div class="char-more">Master en cours · Crypto · IA · Marketing de marque</div></div></div>
       </div>
     </div>
   </div>
@@ -534,29 +653,33 @@ footer{flex-direction:column;gap:16px;text-align:center}
     <p class="sec-sub">Une double compétence unique : finance & digital</p>
   </div>
   <div class="exp-grid">
-    <div class="exp-card rev d1">
+    <div class="exp-card rev d1" data-tip="Cœur de métier · Master en cours à ESBanque">
       <div class="exp-ico">📊</div>
       <div class="exp-title">Gestion de Patrimoine</div>
       <div class="exp-desc">Analyse des besoins clients, conseil en produits d'épargne, optimisation patrimoniale et fiscale.</div>
       <ul class="exp-list"><li>Analyse patrimoniale</li><li>Conseil financier</li><li>Produits d'épargne</li><li>Fiscalité</li></ul>
+      <div class="exp-hover-detail">💡 Acquis en banque (LCL) et approfondi en Master — approche globale du patrimoine privé.</div>
     </div>
-    <div class="exp-card rev d2">
+    <div class="exp-card rev d2" data-tip="18 mois d'expérience terrain · Laforet & Century 21">
       <div class="exp-ico">🏠</div>
       <div class="exp-title">Immobilier</div>
       <div class="exp-desc">Négociation, estimation, commercialisation et accompagnement dans les transactions immobilières.</div>
       <ul class="exp-list"><li>Négociation</li><li>Estimation</li><li>Veille marché</li><li>Conseil juridique</li></ul>
+      <div class="exp-hover-detail">💡 1ère place en concours de négociation · Expérience en agence nationale et indépendante.</div>
     </div>
-    <div class="exp-card rev d3">
+    <div class="exp-card rev d3" data-tip="Compétence transversale développée sur tous mes postes">
       <div class="exp-ico">🤝</div>
       <div class="exp-title">Relation Client</div>
       <div class="exp-desc">Écoute active, fidélisation client et suivi personnalisé pour bâtir des relations durables.</div>
       <ul class="exp-list"><li>Écoute active</li><li>Fidélisation</li><li>Suivi personnalisé</li><li>Conseil stratégique</li></ul>
+      <div class="exp-hover-detail">💡 Profil orienté conseil : je construis des relations de confiance sur le long terme.</div>
     </div>
-    <div class="exp-card rev d4">
+    <div class="exp-card rev d4" data-tip="100% autodidacte · IA, design, web, réseaux sociaux">
       <div class="exp-ico">💻</div>
       <div class="exp-title">Marketing Digital</div>
       <div class="exp-desc">Compétences autodidactes en web design, création de contenu visuel et gestion de présence digitale.</div>
       <ul class="exp-list"><li>Web Design & IA</li><li>Graphisme</li><li>WordPress</li><li>Communication digitale</li></ul>
+      <div class="exp-hover-detail">💡 Ce site a été conçu et réalisé par moi-même — preuve concrète de ces compétences.</div>
     </div>
   </div>
 </section>
@@ -571,46 +694,72 @@ footer{flex-direction:column;gap:16px;text-align:center}
   </div>
   <div class="tl-container">
     <div class="tl-line"></div>
-    <div class="tl-entry">
-      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
-      <div class="tl-card">
-        <div class="tl-card-top"><div class="tl-role">Conseiller Particulier</div><div class="tl-status">En cours</div></div>
-        <div class="tl-company">📍 LCL — Caluire-et-Cuire</div>
-        <div class="tl-meta"><div class="tl-date">📅 Septembre 2024 — Présent</div><div class="tl-badge">Contrat d'apprentissage</div></div>
-        <div class="tl-desc">Conseil bancaire et gestion de patrimoine pour une clientèle de particuliers.</div>
-        <ul class="tl-bullets"><li>Analyser les besoins des clients et proposer des solutions adaptées</li><li>Gérer les comptes courants et les produits d'épargne (livrets, PEL, etc.)</li><li>Réaliser un suivi personnalisé pour fidéliser la clientèle</li></ul>
-      </div>
-    </div>
-    <div class="tl-entry">
-      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
-      <div class="tl-card">
-        <div class="tl-card-top"><div class="tl-role">Négociateur Immobilier</div><div class="tl-status past">Terminé</div></div>
-        <div class="tl-company">📍 Laforet — Meyzieu</div>
-        <div class="tl-meta"><div class="tl-date">📅 Février 2023 — Août 2024</div><div class="tl-badge">Contrat d'apprentissage</div></div>
-        <div class="tl-desc">Gestion complète du cycle de vente immobilière, de la prospection à la signature.</div>
-        <ul class="tl-bullets"><li>Recherche, évaluation et commercialisation de biens</li><li>Négociation des conditions de vente</li><li>Conseil juridique et financier</li><li>Veille marché et concurrentielle</li></ul>
-        <div class="tl-ref">Réf : Gimenez Florian, Responsable d'agence · 06 30 68 90 10</div>
-      </div>
-    </div>
-    <div class="tl-entry">
-      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
-      <div class="tl-card">
-        <div class="tl-card-top"><div class="tl-role">Conseiller Immobilier</div><div class="tl-status past">Terminé</div></div>
-        <div class="tl-company">📍 Century 21 — Agence du Camp</div>
-        <div class="tl-meta"><div class="tl-date">📅 Septembre — Février 2023</div><div class="tl-badge">Contrat d'apprentissage</div></div>
-        <ul class="tl-bullets"><li>Recherche & évaluation de biens</li><li>Organisation de visites</li><li>Suivi des transactions et accompagnement client</li></ul>
-        <div class="tl-ref">Réf : Eric Petit, Directeur d'agence · 06 10 76 04 75</div>
-      </div>
-    </div>
-    <div class="tl-entry">
-      <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
-      <div class="tl-card">
-        <div class="tl-card-top"><div class="tl-role">Assistant Commercial</div><div class="tl-status past">Terminé</div></div>
-        <div class="tl-company">📍 Century 21 — Agence du Camp</div>
-        <div class="tl-meta"><div class="tl-date">📅 Juin 2021</div><div class="tl-badge">Stage</div></div>
-        <ul class="tl-bullets"><li>Création d'une opération de prospection</li><li>Qualification fichier client</li><li>Relance téléphonique et prospection terrain</li></ul>
-      </div>
-    </div>
+
+```
+<!-- NOUVEAU POSTE ACTUEL -->
+<div class="tl-entry">
+  <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--blue);border-color:var(--blue)"></div></div>
+  <div class="tl-card" style="border-color:rgba(30,58,138,.3);background:linear-gradient(135deg,#f0f4ff 0%,#fff 100%)">
+    <div class="tl-card-top"><div class="tl-role">Conseiller Privé</div><div class="tl-status">En cours</div></div>
+    <div class="tl-company">📍 LCL — Saint-Genis-Laval</div>
+    <div class="tl-meta"><div class="tl-date">📅 2025 — Présent</div><div class="tl-badge">Contrat d'apprentissage</div></div>
+    <div class="tl-desc">Conseil patrimonial pour une clientèle de clients privés avec des besoins patrimoniaux complexes.</div>
+    <ul class="tl-bullets">
+      <li>Accompagner les clients dans leurs stratégies patrimoniales</li>
+      <li>Analyser et optimiser les situations patrimoniales et fiscales</li>
+      <li>Proposer des solutions d'investissement et de placement adaptées</li>
+      <li>Assurer un suivi personnalisé et proactif de la clientèle patrimoniale</li>
+    </ul>
+    <div class="tl-hover-tag">💼 Poste actuel · Banque privée · Clientèle patrimoniale</div>
+  </div>
+</div>
+
+<!-- POSTE PRÉCÉDENT LCL CALUIRE -->
+<div class="tl-entry">
+  <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+  <div class="tl-card">
+    <div class="tl-card-top"><div class="tl-role">Conseiller Particulier</div><div class="tl-status past">Terminé</div></div>
+    <div class="tl-company">📍 LCL — Caluire-et-Cuire</div>
+    <div class="tl-meta"><div class="tl-date">📅 Septembre 2024 — 2025</div><div class="tl-badge">Contrat d'apprentissage</div></div>
+    <div class="tl-desc">Conseil bancaire et gestion de patrimoine pour une clientèle de particuliers.</div>
+    <ul class="tl-bullets"><li>Analyser les besoins des clients et proposer des solutions adaptées</li><li>Gérer les comptes courants et les produits d'épargne (livrets, PEL, etc.)</li><li>Réaliser un suivi personnalisé pour fidéliser la clientèle</li></ul>
+    <div class="tl-hover-tag">🏦 Banque retail → tremplin vers le conseil privé</div>
+  </div>
+</div>
+<div class="tl-entry">
+  <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+  <div class="tl-card">
+    <div class="tl-card-top"><div class="tl-role">Négociateur Immobilier</div><div class="tl-status past">Terminé</div></div>
+    <div class="tl-company">📍 Laforet — Meyzieu</div>
+    <div class="tl-meta"><div class="tl-date">📅 Février 2023 — Août 2024</div><div class="tl-badge">Contrat d'apprentissage</div></div>
+    <div class="tl-desc">Gestion complète du cycle de vente immobilière, de la prospection à la signature.</div>
+    <ul class="tl-bullets"><li>Recherche, évaluation et commercialisation de biens</li><li>Négociation des conditions de vente</li><li>Conseil juridique et financier</li><li>Veille marché et concurrentielle</li></ul>
+    <div class="tl-ref">Réf : Gimenez Florian, Responsable d'agence · 06 30 68 90 10</div>
+    <div class="tl-hover-tag">🏠 18 mois · Réseau national Laforet</div>
+  </div>
+</div>
+<div class="tl-entry">
+  <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+  <div class="tl-card">
+    <div class="tl-card-top"><div class="tl-role">Conseiller Immobilier</div><div class="tl-status past">Terminé</div></div>
+    <div class="tl-company">📍 Century 21 — Agence du Camp</div>
+    <div class="tl-meta"><div class="tl-date">📅 Septembre — Février 2023</div><div class="tl-badge">Contrat d'apprentissage</div></div>
+    <ul class="tl-bullets"><li>Recherche & évaluation de biens</li><li>Organisation de visites</li><li>Suivi des transactions et accompagnement client</li></ul>
+    <div class="tl-ref">Réf : Eric Petit, Directeur d'agence · 06 10 76 04 75</div>
+    <div class="tl-hover-tag">🏡 1er poste en immobilier · Réseau Century 21</div>
+  </div>
+</div>
+<div class="tl-entry">
+  <div class="tl-dot-wrap"><div class="tl-dot"></div></div>
+  <div class="tl-card">
+    <div class="tl-card-top"><div class="tl-role">Assistant Commercial</div><div class="tl-status past">Terminé</div></div>
+    <div class="tl-company">📍 Century 21 — Agence du Camp</div>
+    <div class="tl-meta"><div class="tl-date">📅 Juin 2021</div><div class="tl-badge">Stage</div></div>
+    <ul class="tl-bullets"><li>Création d'une opération de prospection</li><li>Qualification fichier client</li><li>Relance téléphonique et prospection terrain</li></ul>
+  </div>
+</div>
+```
+
   </div>
 </section>
 
@@ -664,48 +813,65 @@ footer{flex-direction:column;gap:16px;text-align:center}
   </div>
   <div class="comp-section-title rev"><span class="icon">🏆</span> Réalisations Notables</div>
   <div class="real-grid">
-    <div class="real-card rev d1">
+    <div class="real-card rev d1" data-tip="Sur 60 participants · Concours inter-établissements 2023">
       <div class="real-ico">🏆</div>
       <div class="real-year">2023</div>
       <div class="real-title">Champion de Négociation</div>
       <div class="real-desc">1ère place au concours « Journée de la Négociation »</div>
       <div class="real-tag">Sur 60 participants</div>
+      <div class="real-hover-more">→ Preuve de maîtrise et d'intelligence situationnelle</div>
     </div>
-    <div class="real-card rev d2">
+    <div class="real-card rev d2" data-tip="Bac Pro Commerce & Vente · Lycée Saint-Charles · 2022">
       <div class="real-ico">🎓</div>
       <div class="real-year">2022</div>
       <div class="real-title">Mention Très Bien</div>
       <div class="real-desc">Baccalauréat Professionnel</div>
       <div class="real-tag">Excellence académique</div>
+      <div class="real-hover-more">→ Rigueur académique dès le début du parcours</div>
     </div>
-    <div class="real-card rev d3">
+    <div class="real-card rev d3" data-tip="Conçu et réalisé en autonomie totale avec IA + code">
       <div class="real-ico">💻</div>
       <div class="real-year">2025</div>
       <div class="real-title">Site Web Autodidacte</div>
       <div class="real-desc">Conception et réalisation de ce portfolio</div>
       <div class="real-tag">Compétences digitales autonomes</div>
+      <div class="real-hover-more">→ Ce site lui-même est la preuve</div>
     </div>
   </div>
   <div class="comp-section-title rev"><span class="icon" style="background:#F0FDF4;color:#166534">💻</span> Compétences Techniques</div>
   <div class="skills-grid">
     <div class="skills-card rev d1">
       <div class="skills-card-title">Design</div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Adobe Photoshop</span><span class="skill-pct">71%</span></div><div class="skill-track"><div class="skill-fill" data-w="71"></div></div></div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Canva</span><span class="skill-pct">86%</span></div><div class="skill-track"><div class="skill-fill" data-w="86"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Adobe Photoshop</span><span class="skill-pct">71%</span></div><div class="skill-track"><div class="skill-fill blue" data-w="71"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Canva</span><span class="skill-pct">86%</span></div><div class="skill-track"><div class="skill-fill blue" data-w="86"></div></div></div>
     </div>
     <div class="skills-card rev d2">
       <div class="skills-card-title">Vidéo</div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Adobe Premiere Pro</span><span class="skill-pct">63%</span></div><div class="skill-track"><div class="skill-fill" data-w="63"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Adobe Premiere Pro</span><span class="skill-pct">63%</span></div><div class="skill-track"><div class="skill-fill purple" data-w="63"></div></div></div>
     </div>
     <div class="skills-card rev d3">
-      <div class="skills-card-title">Web</div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">WordPress</span><span class="skill-pct">77%</span></div><div class="skill-track"><div class="skill-fill" data-w="77"></div></div></div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Prestashop</span><span class="skill-pct">70%</span></div><div class="skill-track"><div class="skill-fill" data-w="70"></div></div></div>
+      <div class="skills-card-title">Web & Digital</div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">WordPress</span><span class="skill-pct">77%</span></div><div class="skill-track"><div class="skill-fill teal" data-w="77"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Prestashop</span><span class="skill-pct">70%</span></div><div class="skill-track"><div class="skill-fill teal" data-w="70"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Outils IA & No-code</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill teal" data-w="85"></div></div></div>
     </div>
     <div class="skills-card rev d4">
       <div class="skills-card-title">Commercial & Finance</div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Négociation</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill" data-w="95"></div></div></div>
-      <div class="skill-row"><div class="skill-info"><span class="skill-name">Analyse patrimoniale</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill" data-w="85"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Négociation</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill green" data-w="95"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Analyse patrimoniale</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill green" data-w="85"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Conseil financier</span><span class="skill-pct">82%</span></div><div class="skill-track"><div class="skill-fill green" data-w="82"></div></div></div>
+    </div>
+    <div class="skills-card rev d1">
+      <div class="skills-card-title">Marketing & Brand</div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Réseaux sociaux</span><span class="skill-pct">83%</span></div><div class="skill-track"><div class="skill-fill amber" data-w="83"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Stratégie de marque</span><span class="skill-pct">78%</span></div><div class="skill-track"><div class="skill-fill amber" data-w="78"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Création de contenu</span><span class="skill-pct">80%</span></div><div class="skill-track"><div class="skill-fill amber" data-w="80"></div></div></div>
+    </div>
+    <div class="skills-card rev d2">
+      <div class="skills-card-title">Soft Skills</div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Adaptabilité</span><span class="skill-pct">95%</span></div><div class="skill-track"><div class="skill-fill rose" data-w="95"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Leadership</span><span class="skill-pct">88%</span></div><div class="skill-track"><div class="skill-fill rose" data-w="88"></div></div></div>
+      <div class="skill-row"><div class="skill-info"><span class="skill-name">Autodidaxie</span><span class="skill-pct">92%</span></div><div class="skill-track"><div class="skill-fill rose" data-w="92"></div></div></div>
     </div>
   </div>
 </section>
@@ -714,12 +880,12 @@ footer{flex-direction:column;gap:16px;text-align:center}
 
 <section id="apropos2">
   <div class="comp-section-title rev"><span class="icon">🌍</span> Langues</div>
-  <div class="lang-grid">
-    <div class="lang-card rev d1"><span class="lang-flag">🇫🇷</span><div class="lang-name">Français</div><div class="lang-level">Langue maternelle</div></div>
-    <div class="lang-card rev d2"><span class="lang-flag">🇬🇧</span><div class="lang-name">Anglais</div><div class="lang-level">B1 – Intermédiaire</div></div>
-    <div class="lang-card rev d3"><span class="lang-flag">🇮🇹</span><div class="lang-name">Italien</div><div class="lang-level">A1 – Débutant</div></div>
-    <div class="lang-card rev d4"><span class="lang-flag">🇪🇸</span><div class="lang-name">Espagnol</div><div class="lang-level">A1 – Débutant</div></div>
-  </div>
+    <div class="lang-grid">
+    <div class="lang-card rev d1"><span class="lang-flag">🇫🇷</span><div class="lang-name">Français</div><div class="lang-level">Langue maternelle</div><div class="lang-hover">✓ Communication native</div></div>
+    <div class="lang-card rev d2"><span class="lang-flag">🇬🇧</span><div class="lang-name">Anglais</div><div class="lang-level">B1 – Intermédiaire</div><div class="lang-hover">✓ Capable en contexte professionnel</div></div>
+    <div class="lang-card rev d3"><span class="lang-flag">🇮🇹</span><div class="lang-name">Italien</div><div class="lang-level">A1 – Débutant</div><div class="lang-hover">📚 En cours d'apprentissage</div></div>
+    <div class="lang-card rev d4"><span class="lang-flag">🇪🇸</span><div class="lang-name">Espagnol</div><div class="lang-level">A1 – Débutant</div><div class="lang-hover">📚 En cours d'apprentissage</div></div>
+    </div>
   <div class="comp-section-title rev" style="margin-top:40px"><span class="icon">😊</span> Centres d'Intérêt</div>
   <div class="interest-chips">
     <div class="chip">🏃 Sport</div>
@@ -744,7 +910,7 @@ footer{flex-direction:column;gap:16px;text-align:center}
       <h3>Informations de Contact</h3>
       <p>Je suis actuellement à la recherche d'opportunités en tant que conseiller en gestion de patrimoine ou dans des postes liés au marketing. N'hésitez pas à me contacter.</p>
       <div class="ct-items">
-        <div class="ct-item"><div class="ct-ico">✉️</div><div><div class="ct-label">Email</div><div class="ct-val">Bertrand.charles.pro@gmail.com</div></div></div>
+        <div class="ct-item"><div class="ct-ico">✉️</div><div><div class="ct-label">Email</div><div class="ct-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f5d7a6d6b6d7e717b317c777e6d737a6c316f6d705f78727e7673317c7072">[email&#160;protected]</a></div></div></div>
         <div class="ct-item"><div class="ct-ico">📞</div><div><div class="ct-label">Téléphone</div><div class="ct-val">07 76 69 33 68</div></div></div>
         <div class="ct-item"><div class="ct-ico">📍</div><div><div class="ct-label">Localisation</div><div class="ct-val">Rillieux-la-Pape, Lyon</div></div></div>
         <div class="ct-item"><div class="ct-ico">💼</div><div><div class="ct-label">LinkedIn</div><div class="ct-val">Voir mon profil</div></div></div>
@@ -755,10 +921,10 @@ footer{flex-direction:column;gap:16px;text-align:center}
       <div class="form-wrap">
         <div id="f-form">
           <div class="form-title">Envoyez-moi un Message</div>
-          <div class="f-field"><label class="f-lbl">Nom complet *</label><input type="text" class="f-inp" placeholder="Votre nom" id="f-name"></div>
-          <div class="f-field"><label class="f-lbl">Email *</label><input type="email" class="f-inp" placeholder="votre.email@exemple.com" id="f-email"></div>
-          <div class="f-field"><label class="f-lbl">Sujet *</label><input type="text" class="f-inp" placeholder="Objet de votre message"></div>
-          <div class="f-field"><label class="f-lbl">Message *</label><textarea class="f-inp" placeholder="Décrivez votre projet ou votre opportunité..."></textarea></div>
+          <div class="f-field"><label class="f-lbl">Nom complet *</label><input type="text" class="f-inp" placeholder="Votre nom" id="f-name"><div class="f-hint">Ex : Jean Dupont — Directeur RH</div></div>
+          <div class="f-field"><label class="f-lbl">Email *</label><input type="email" class="f-inp" placeholder="votre.email@exemple.com" id="f-email"><div class="f-hint">Je vous réponds sous 24h garantis</div></div>
+          <div class="f-field"><label class="f-lbl">Sujet *</label><input type="text" class="f-inp" placeholder="Objet de votre message"><div class="f-hint">Ex : Opportunité CDI · Alternance · Collaboration</div></div>
+          <div class="f-field"><label class="f-lbl">Message *</label><textarea class="f-inp" placeholder="Décrivez votre projet ou votre opportunité..."></textarea><div class="f-hint">Plus vous êtes précis, mieux je pourrai vous répondre</div></div>
           <button class="btn-primary f-submit" onclick="sendForm()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Envoyer le Message
@@ -788,32 +954,20 @@ footer{flex-direction:column;gap:16px;text-align:center}
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
 /* SCROLL PROGRESS + NAV */
-const prog=document.getElementById('prog'), nav=document.getElementById('nav');
-window.addEventListener('scroll',()=>{
-  const h=document.body.scrollHeight-window.innerHeight;
-  prog.style.width=(window.scrollY/h*100)+'%';
-  nav.classList.toggle('scrolled',window.scrollY>10);
+const prog=document.getElementById(‘prog’), nav=document.getElementById(‘nav’);
+window.addEventListener(‘scroll’,()=>{
+const h=document.body.scrollHeight-window.innerHeight;
+prog.style.width=(window.scrollY/h*100)+’%’;
+nav.classList.toggle(‘scrolled’,window.scrollY>10);
 });
 
 /* REVEAL */
-const obs=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.08});
-document.querySelectorAll('.rev,.tl-entry,.form-card').forEach(el=>obs.observe(el));
+const obs=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting)e.target.classList.add(‘vis’)})},{threshold:.08});
+document.querySelectorAll(’.rev,.tl-entry,.form-card’).forEach(el=>obs.observe(el));
 
 /* SKILL BARS */
-const barObs=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll('.skill-fill').forEach(b=>b.style.width=b.dataset.w+'%');barObs.unobserve(e.target)}})},{threshold:.3});
-document.querySelectorAll('.skills-card').forEach(c=>barObs.observe(c));
-
-/* FORM */
-function sendForm(){
-  const n=document.getElementById('f-name').value.trim();
-  const e=document.getElementById('f-email').value.trim();
-  if(!n||!e){alert('Merci de remplir votre nom et votre email.');return;}
-  document.getElementById('f-form').style.display='none';
-  document.getElementById('f-ok').style.display='block';
-}
-</script>
-
-</body>
-</html>
+const barObs=new IntersectionObserver(ents=>{ents.forEach(e=>{if(e.isIntersecting){e.target.querySelectorAll(’.skill-fill’).forEach(b=>b.style.width=b.dataset.w+’%’);barObs.unobserve(e.target)}})},{threshold:.2});
+document.querySelectorAll(’.skills-card’).forEach(c=>barObs.observe(c));
