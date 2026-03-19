@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Charles Bertrand — Gestion de Patrimoine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,600&family=DM+Sans:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#04101E;
+  --navy2:#081828;
+  --navy3:#0D2240;
+  --gold:#D4A843;
+  --gold2:#E8C060;
+  --gold-glow:rgba(212,168,67,.22);
+  --gold-line:rgba(212,168,67,.28);
+  --white:#FFFFFF;
+  --white2:#F0EBE0;
+  --white3:rgba(255,255,255,.72);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--white);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+
+/* ── SCROLL PROGRESS ── */
+#prog{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(–gold),var(–gold2));z-index:999;width:0%;transition:width .1s linear;box-shadow:0 0 10px var(–gold)}
+
+/* ── CURSOR ── */
+#cur{position:fixed;width:8px;height:8px;background:var(–gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference}
+#cur2{position:fixed;width:34px;height:34px;border:1.5px solid var(–gold);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .4s var(–ease),height .4s var(–ease),opacity .4s,border-color .4s;opacity:.5}
+body.hovering #cur2{width:60px;height:60px;opacity:.9;border-color:var(–gold2)}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:300;padding:32px 72px;display:flex;justify-content:space-between;align-items:center;transition:all .5s var(–ease)}
+nav.stuck{background:rgba(4,16,30,.97);backdrop-filter:blur(28px);padding:18px 72px;border-bottom:1px solid var(–gold-line)}
+.nav-logo{font-family:‘Cormorant Garamond’,serif;font-size:22px;font-weight:600;letter-spacing:6px;color:var(–gold);text-decoration:none}
+.nav-links{display:flex;gap:48px;list-style:none}
+.nav-links a{color:var(–white3);text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:500;position:relative;transition:color .3s}
+.nav-links a::after{content:’’;position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(–gold2);transition:width .4s var(–ease)}
+.nav-links a:hover{color:var(–white)}
+.nav-links a:hover::after{width:100%}
+
+/* ── HERO ── */
+#hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 72px;position:relative;overflow:hidden}
+#canvas{position:absolute;inset:0;z-index:0}
+.h-overlay{position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(8,24,40,.5) 0%,var(–navy) 75%);z-index:1}
+.h-content{position:relative;z-index:2;max-width:900px}
+.h-pre{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(–gold2);font-weight:500;margin-bottom:32px;opacity:0;animation:fadeUp .8s .2s forwards;display:flex;align-items:center;gap:18px}
+.h-pre::before{content:’’;display:block;width:48px;height:1px;background:var(–gold2)}
+.h-name{font-family:‘Cormorant Garamond’,serif;font-size:clamp(72px,11vw,156px);font-weight:300;line-height:.86;letter-spacing:-4px;margin-bottom:40px;opacity:0;animation:fadeUp .8s .4s forwards;position:relative}
+.h-name span{display:block}
+.h-name em{color:var(–gold);font-style:italic;position:relative}
+.h-name em::after{content:’’;position:absolute;bottom:4px;left:0;right:0;height:2px;background:linear-gradient(90deg,var(–gold),transparent);opacity:.4}
+.h-rule{width:80px;height:1px;background:linear-gradient(90deg,var(–gold2),transparent);margin-bottom:32px;opacity:0;animation:fadeUp .8s .6s forwards}
+.h-typed-wrap{font-size:17px;font-weight:300;color:var(–white2);max-width:560px;line-height:1.9;margin-bottom:64px;opacity:0;animation:fadeUp .8s .8s forwards;min-height:60px}
+#typed-cursor{display:inline-block;width:2px;height:18px;background:var(–gold);vertical-align:middle;margin-left:2px;animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.h-cta{display:flex;gap:24px;align-items:center;opacity:0;animation:fadeUp .8s 1s forwards;flex-wrap:wrap}
+
+/* magnetic btn */
+.btn-mag{display:inline-block;position:relative;padding:16px 52px;background:var(–gold);color:var(–navy);text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:500;font-family:‘DM Sans’,sans-serif;overflow:hidden;transition:color .4s}
+.btn-mag .btn-bg{position:absolute;inset:0;background:var(–white);transform:scaleY(0);transform-origin:bottom;transition:transform .45s var(–ease)}
+.btn-mag:hover .btn-bg{transform:scaleY(1)}
+.btn-mag span{position:relative;z-index:1}
+.btn-outline{color:var(–white2);text-decoration:none;font-size:10px;letter-spacing:3px;text-transform:uppercase;font-weight:400;font-family:‘DM Sans’,sans-serif;transition:color .3s;display:flex;align-items:center;gap:10px}
+.btn-outline:hover{color:var(–gold2)}
+.btn-outline svg{transition:transform .3s}
+.btn-outline:hover svg{transform:translateX(5px)}
+
+/* hero stats */
+.h-stats{position:absolute;right:72px;bottom:80px;display:flex;flex-direction:column;gap:40px;text-align:right;z-index:2;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.stat-n{font-family:‘Cormorant Garamond’,serif;font-size:58px;font-weight:300;line-height:1;color:var(–gold2)}
+.stat-n sup{font-size:24px;vertical-align:super}
+.stat-l{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(–white3);margin-top:2px}
+
+/* scroll hint */
+.h-scroll{position:absolute;bottom:40px;left:72px;z-index:2;opacity:0;animation:fadeUp .8s 1.4s forwards;display:flex;align-items:center;gap:14px}
+.h-scroll-line{width:1px;height:60px;background:linear-gradient(var(–gold),transparent);animation:pulse2 2s ease-in-out infinite}
+.h-scroll-t{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(–white3);writing-mode:vertical-rl}
+
+/* ── SHARED ── */
+section{padding:140px 72px}
+.s-head{margin-bottom:80px}
+.s-num{font-family:‘Cormorant Garamond’,serif;font-size:130px;font-weight:300;color:rgba(212,168,67,.05);line-height:1;letter-spacing:-5px;margin-bottom:-62px;user-select:none}
+.s-title{font-family:‘Cormorant Garamond’,serif;font-size:58px;font-weight:300;letter-spacing:-1.5px;color:var(–white)}
+.s-title em{font-style:italic;color:var(–gold)}
+.s-rule{width:52px;height:1px;background:var(–gold);margin-top:22px}
+.s-sub{font-size:13px;color:var(–white3);margin-top:16px;letter-spacing:.3px;max-width:480px;line-height:1.8}
+
+/* ── ABOUT ── */
+#about{display:grid;grid-template-columns:1fr 1fr;gap:104px;align-items:center;background:var(–navy2)}
+.about-quote{font-family:‘Cormorant Garamond’,serif;font-size:29px;font-weight:300;line-height:1.7;color:var(–white)}
+.about-quote strong{color:var(–gold2);font-weight:400}
+.about-cards{display:flex;flex-direction:column;gap:2px}
+.acard{display:flex;gap:22px;padding:26px 28px;border:1px solid var(–gold-line);background:rgba(13,34,64,.5);transition:border-color .35s,background .35s,transform .35s var(–ease);cursor:default}
+.acard:hover{border-color:rgba(212,168,67,.6);background:rgba(13,34,64,.9);transform:translateX(6px)}
+.acard-icon{color:var(–gold);font-size:18px;flex-shrink:0;padding-top:1px}
+.acard-lbl{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(–gold2);margin-bottom:6px;font-weight:500}
+.acard-val{font-size:14px;color:var(–white2);line-height:1.65;font-weight:300}
+
+/* ── TIMELINE ── */
+#timeline{background:var(–navy3);position:relative;overflow:hidden}
+#timeline::before{content:’’;position:absolute;top:-200px;right:-200px;width:600px;height:600px;border:1px solid rgba(212,168,67,.04);border-radius:50%;pointer-events:none}
+.tl-wrap{position:relative;max-width:880px;margin:0 auto}
+.tl-axis{position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(–gold),rgba(212,168,67,.04));transform:translateX(-50%)}
+.tl-item{display:grid;grid-template-columns:1fr 1fr;gap:72px;margin-bottom:88px;position:relative;opacity:0;transform:translateY(32px);transition:opacity .7s var(–ease),transform .7s var(–ease)}
+.tl-item.vis{opacity:1;transform:translateY(0)}
+.tl-dot{position:absolute;left:50%;top:24px;width:13px;height:13px;border:2px solid var(–gold);background:var(–navy3);border-radius:50%;transform:translateX(-50%);transition:background .3s,transform .3s;z-index:2}
+.tl-item:hover .tl-dot{background:var(–gold);transform:translateX(-50%) scale(1.4)}
+.tl-date-col{display:flex;align-items:flex-start;padding-top:24px}
+.tl-date{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(–gold2);font-weight:500}
+
+/* tilt card */
+.tl-card{background:rgba(4,16,30,.8);border:1px solid var(–gold-line);padding:34px 32px;backdrop-filter:blur(16px);transition:border-color .35s;transform-style:preserve-3d;will-change:transform;cursor:default}
+.tl-card:hover{border-color:rgba(212,168,67,.55)}
+.tl-badge{display:inline-block;font-size:8.5px;letter-spacing:3px;text-transform:uppercase;color:var(–gold);border:1px solid var(–gold-line);padding:4px 14px;margin-bottom:16px}
+.tl-co{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:var(–white3);margin-bottom:8px;font-weight:400}
+.tl-role{font-family:‘Cormorant Garamond’,serif;font-size:26px;font-weight:400;margin-bottom:16px;line-height:1.15;color:var(–white)}
+.tl-desc{font-size:13px;color:var(–white3);line-height:1.8;font-weight:300}
+.tl-ref{font-size:10.5px;color:var(–gold-line);margin-top:12px;border-top:1px solid rgba(212,168,67,.1);padding-top:12px}
+
+/* ── SKILLS ── */
+#skills{background:var(–navy)}
+.sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.sk-block{background:var(–navy2);padding:46px 38px;border:1px solid rgba(212,168,67,.07);position:relative;overflow:hidden;transition:border-color .3s,background .3s;cursor:default}
+.sk-block::before{content:’’;position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(–gold),var(–gold2));transform:scaleX(0);transform-origin:left;transition:transform .5s var(–ease)}
+.sk-block:hover::before{transform:scaleX(1)}
+.sk-block:hover{border-color:rgba(212,168,67,.25);background:rgba(13,34,64,.9)}
+.sk-block:hover .sk-num{opacity:1}
+.sk-num{font-family:‘Cormorant Garamond’,serif;font-size:88px;font-weight:300;color:rgba(212,168,67,.05);position:absolute;bottom:-20px;right:16px;line-height:1;opacity:0;transition:opacity .4s;user-select:none}
+.sk-cat{font-size:9px;letter-spacing:3.5px;text-transform:uppercase;color:var(–gold2);margin-bottom:24px;font-weight:500}
+.sk-list{list-style:none;display:flex;flex-direction:column;gap:0}
+.sk-item{display:flex;flex-direction:column;gap:6px;padding:9px 0;border-bottom:1px solid rgba(212,168,67,.06)}
+.sk-item:last-child{border-bottom:none}
+.sk-item-top{display:flex;justify-content:space-between;align-items:center}
+.sk-label{font-size:13.5px;color:var(–white2);font-weight:300}
+.sk-pct{font-size:10px;color:var(–gold);font-weight:500;letter-spacing:1px}
+.sk-bar-wrap{height:2px;background:rgba(212,168,67,.12);border-radius:2px;overflow:hidden}
+.sk-bar{height:100%;background:linear-gradient(90deg,var(–gold),var(–gold2));border-radius:2px;width:0%;transition:width 1.2s var(–ease)}
+
+/* ── ACHIEVEMENTS ── */
+#achievements{background:var(–navy2)}
+.ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+.ach-card{border:1px solid var(–gold-line);padding:48px 42px;position:relative;overflow:hidden;transition:border-color .4s,transform .45s var(–ease);cursor:default}
+.ach-card::before{content:’’;position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,168,67,.04) 0%,transparent 60%);opacity:0;transition:opacity .4s}
+.ach-card:hover::before{opacity:1}
+.ach-card::after{content:’’;position:absolute;bottom:-60px;right:-60px;width:160px;height:160px;border:1px solid rgba(212,168,67,.07);border-radius:50%}
+.ach-card:hover{border-color:rgba(212,168,67,.6);transform:translateY(-8px)}
+.ach-ico{font-size:44px;margin-bottom:10px;display:block;filter:drop-shadow(0 0 12px rgba(212,168,67,.3))}
+.ach-counter{font-family:‘Cormorant Garamond’,serif;font-size:80px;font-weight:300;line-height:.9;color:rgba(212,168,67,.12);margin-bottom:-40px;display:block}
+.ach-title{font-family:‘Cormorant Garamond’,serif;font-size:30px;font-weight:400;margin-bottom:14px;line-height:1.2;color:var(–white)}
+.ach-desc{font-size:13.5px;color:var(–white3);line-height:1.8;font-weight:300}
+.ach-badge{display:inline-flex;align-items:center;gap:8px;margin-top:24px;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(–gold);border:1px solid var(–gold-line);padding:6px 16px}
+.ach-badge::before{content:’’;width:5px;height:5px;background:var(–gold);border-radius:50%;animation:pulse2 1.5s ease-in-out infinite}
+
+/* ── CONTACT ── */
+#contact{background:var(–navy3)}
+.ct-grid{display:grid;grid-template-columns:1fr 1fr;gap:104px;align-items:start}
+.ct-headline{font-family:‘Cormorant Garamond’,serif;font-size:52px;font-weight:300;line-height:1.1;margin-bottom:44px;color:var(–white)}
+.ct-headline em{color:var(–gold);font-style:italic}
+.ct-info{display:flex;flex-direction:column;gap:18px;margin-bottom:44px}
+.ct-item{display:flex;align-items:center;gap:18px;font-size:14px;color:var(–white2);font-weight:300;transition:color .3s}
+.ct-item:hover{color:var(–white)}
+.ct-ico{width:42px;height:42px;flex-shrink:0;border:1px solid var(–gold-line);display:flex;align-items:center;justify-content:center;color:var(–gold);font-size:16px;transition:background .3s,border-color .3s}
+.ct-item:hover .ct-ico{background:var(–gold-glow);border-color:var(–gold)}
+.ct-avail{display:flex;align-items:center;gap:10px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(–gold2);font-weight:400}
+.ct-dot{width:7px;height:7px;background:#4CAF50;border-radius:50%;box-shadow:0 0 10px rgba(76,175,80,.5);animation:pulse2 2s ease-in-out infinite}
+
+/* form */
+.f-field{margin-bottom:28px;position:relative}
+.f-lbl{display:block;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(–gold);margin-bottom:12px;font-weight:500}
+.f-inp{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(212,168,67,.2);padding:14px 0;color:var(–white);font-family:‘DM Sans’,sans-serif;font-size:14px;font-weight:300;outline:none;transition:border-color .3s}
+.f-inp:focus{border-color:var(–gold2)}
+.f-inp::placeholder{color:rgba(255,255,255,.2)}
+textarea.f-inp{resize:none;min-height:100px}
+.f-btn{width:100%;padding:19px;background:var(–gold);color:var(–navy);border:none;font-family:‘DM Sans’,sans-serif;font-size:10px;letter-spacing:3.5px;text-transform:uppercase;font-weight:500;cursor:none;position:relative;overflow:hidden;transition:color .4s}
+.f-btn::before{content:’’;position:absolute;inset:0;background:var(–white);transform:scaleX(0);transform-origin:left;transition:transform .5s var(–ease)}
+.f-btn:hover::before{transform:scaleX(1)}
+.f-btn span{position:relative;z-index:1}
+#f-ok{display:none;text-align:center;padding:56px 32px;border:1px solid var(–gold-line)}
+.f-ok-icon{font-size:48px;color:var(–gold);margin-bottom:20px;display:block}
+.f-ok-txt{font-family:‘Cormorant Garamond’,serif;font-size:26px;font-weight:300;line-height:1.5;color:var(–white)}
+
+/* ── FOOTER ── */
+footer{padding:44px 72px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(212,168,67,.1)}
+.ft-logo{font-family:‘Cormorant Garamond’,serif;font-size:20px;font-weight:600;letter-spacing:6px;color:var(–gold)}
+.ft-copy{font-size:10px;color:var(–white3);letter-spacing:1.5px}
+.ft-links{display:flex;gap:24px}
+.ft-links a{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(–white3);text-decoration:none;transition:color .3s}
+.ft-links a:hover{color:var(–gold)}
+
+/* ── REVEAL ── */
+.rev{opacity:0;transform:translateY(40px);transition:opacity .8s var(–ease),transform .8s var(–ease)}
+.rev.vis{opacity:1;transform:translateY(0)}
+.d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.34s}.d4{transition-delay:.46s}
+
+/* ── GLITCH hover on name ── */
+.h-name:hover em{animation:glitch .4s steps(1,end)}
+@keyframes glitch{
+0%{text-shadow:none}
+20%{text-shadow:3px 0 var(–navy),−3px 0 rgba(212,168,67,.5)}
+40%{text-shadow:−3px 0 var(–navy),3px 0 rgba(212,168,67,.5)}
+60%{text-shadow:2px 2px var(–navy)}
+80%{text-shadow:none}
+100%{text-shadow:none}
+}
+
+/* ── keyframes ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse2{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+nav{padding:22px 28px}
+nav.stuck{padding:15px 28px}
+.nav-links{gap:22px}
+section{padding:88px 28px}
+#about{grid-template-columns:1fr;gap:52px}
+.tl-item{grid-template-columns:1fr;gap:14px}
+.tl-axis,.tl-dot{display:none}
+.sk-grid{grid-template-columns:1fr 1fr}
+.ach-grid{grid-template-columns:1fr}
+.ct-grid{grid-template-columns:1fr;gap:52px}
+.h-stats{display:none}
+#hero{padding:0 28px}
+}
+@media(max-width:600px){
+.sk-grid{grid-template-columns:1fr}
+.nav-links{display:none}
+.h-name{font-size:60px;letter-spacing:-2px}
+}
+</style>
+
+</head>
+<body>
+
+<!-- SCROLL PROGRESS -->
+
+<div id="prog"></div>
+
+<!-- CURSOR -->
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+
+<nav id="nav">
+  <a href="#hero" class="nav-logo">CB</a>
+  <ul class="nav-links">
+    <li><a href="#about">Profil</a></li>
+    <li><a href="#timeline">Parcours</a></li>
+    <li><a href="#skills">Compétences</a></li>
+    <li><a href="#achievements">Réalisations</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+
+<section id="hero">
+  <canvas id="canvas"></canvas>
+  <div class="h-overlay"></div>
+  <div class="h-content">
+    <p class="h-pre">Conseiller en Gestion de Patrimoine</p>
+    <h1 class="h-name">
+      <span>Charles</span>
+      <em>Bertrand.</em>
+    </h1>
+    <div class="h-rule"></div>
+    <div class="h-typed-wrap">
+      <span id="typed"></span><span id="typed-cursor"></span>
+    </div>
+    <div class="h-cta">
+      <a href="#contact" class="btn-mag"><div class="btn-bg"></div><span>Me contacter</span></a>
+      <a href="#timeline" class="btn-outline">
+        Voir mon parcours
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="none"><path d="M1 5h14M10 1l5 4-5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="h-stats">
+    <div><div class="stat-n" data-count="1" data-suffix="er">0</div><div class="stat-l">Journée de la Négociation</div></div>
+    <div><div class="stat-n" data-count="4" data-suffix="+">0</div><div class="stat-l">Années d'expérience terrain</div></div>
+    <div><div class="stat-n" data-count="3" data-suffix="">0</div><div class="stat-l">Secteurs maîtrisés</div></div>
+  </div>
+  <div class="h-scroll"><div class="h-scroll-line"></div><span class="h-scroll-t">Scroll</span></div>
+</section>
+
+<!-- ═══ ABOUT ═══ -->
+
+<section id="about">
+  <div class="rev">
+    <div class="s-head">
+      <div class="s-num">01</div>
+      <h2 class="s-title">Qui suis-<em>je</em></h2>
+      <div class="s-rule"></div>
+    </div>
+    <p class="about-quote">Passionné par la <strong>création de valeur</strong> — financière, patrimoniale ou de marque. Mon parcours atypique me confère une vision 360° rare&nbsp;: de la négociation terrain à l'analyse financière, en passant par le <strong>digital et le marketing.</strong></p>
+  </div>
+  <div class="about-cards">
+    <div class="acard rev d1"><div class="acard-icon">◈</div><div><div class="acard-lbl">Formation</div><div class="acard-val">Master Gestion de Patrimoine (en cours)<br>Bac+3 CPAT — Conseiller de Patrimoine<br>BTS NDRC — Institut Carrel</div></div></div>
+    <div class="acard rev d2"><div class="acard-icon">◈</div><div><div class="acard-lbl">Localisation</div><div class="acard-val">Lyon, Rhône-Alpes · Mobilité nationale</div></div></div>
+    <div class="acard rev d3"><div class="acard-icon">◈</div><div><div class="acard-lbl">Langues</div><div class="acard-val">Français — Natif · Anglais — B1<br>Espagnol / Italien — Notions</div></div></div>
+    <div class="acard rev d4"><div class="acard-icon">◈</div><div><div class="acard-lbl">Intérêts</div><div class="acard-val">Finance & Marchés · Brand Strategy · Design · Sport · Tech & IA</div></div></div>
+  </div>
+</section>
+
+<!-- ═══ TIMELINE ═══ -->
+
+<section id="timeline">
+  <div class="s-head rev">
+    <div class="s-num">02</div>
+    <h2 class="s-title">Mon <em>Parcours</em></h2>
+    <div class="s-rule"></div>
+    <p class="s-sub">Une progression sectorielle rare — de l'immobilier à la banque, jusqu'au conseil patrimonial.</p>
+  </div>
+  <div class="tl-wrap">
+    <div class="tl-axis"></div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">Sept. 2024 — Présent</div></div>
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-badge">Alternance · Banque</div>
+        <div class="tl-co">LCL — Caluire-et-Cuire</div>
+        <div class="tl-role">Conseiller Particulier</div>
+        <div class="tl-desc">Analyse des besoins clients · Produits d'épargne (livrets, PEL) · Suivi personnalisé et fidélisation clientèle · Initiation à la gestion patrimoniale bancaire</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-badge">Alternance · Immobilier</div>
+        <div class="tl-co">Laforet — Meyzieu</div>
+        <div class="tl-role">Négociateur Immobilier</div>
+        <div class="tl-desc">Estimation & commercialisation de biens · Négociation des conditions · Conseil juridique et financier · Veille marché et concurrentielle</div>
+        <div class="tl-ref">Réf : Gimenez Florian, Responsable d'agence · 06 30 68 90 10</div>
+      </div>
+      <div class="tl-dot"></div>
+      <div class="tl-date-col" style="justify-content:flex-end"><div class="tl-date">Fév. 2023 — Août 2024</div></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date-col"><div class="tl-date">Sept. — Fév. 2023</div></div>
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-badge">Alternance · Immobilier</div>
+        <div class="tl-co">Century 21 — Agence du Camp</div>
+        <div class="tl-role">Conseiller Immobilier</div>
+        <div class="tl-desc">Recherche & évaluation de biens · Organisation de visites · Suivi complet des transactions · Accompagnement client sur-mesure</div>
+        <div class="tl-ref">Réf : Eric Petit, Directeur d'agence · 06 10 76 04 75</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-card">
+        <div class="tl-badge">Stage · Commercial</div>
+        <div class="tl-co">Century 21 — Agence du Camp</div>
+        <div class="tl-role">Assistant Commercial</div>
+        <div class="tl-desc">Création d'une opération de prospection · Qualification fichier client · Relance téléphonique et prospection terrain</div>
+      </div>
+      <div class="tl-dot"></div>
+      <div class="tl-date-col" style="justify-content:flex-end"><div class="tl-date">Juin 2021</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+
+<section id="skills">
+  <div class="s-head rev">
+    <div class="s-num">03</div>
+    <h2 class="s-title">Compé<em>tences</em></h2>
+    <div class="s-rule"></div>
+  </div>
+  <div class="sk-grid">
+    <div class="sk-block rev d1">
+      <div class="sk-num">01</div>
+      <div class="sk-cat">Finance & Patrimoine</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Analyse patrimoniale</span><span class="sk-pct">88%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="88"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Produits d'épargne</span><span class="sk-pct">82%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="82"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Estimation immobilière</span><span class="sk-pct">90%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="90"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Marchés & Crypto</span><span class="sk-pct">75%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="75"></div></div></li>
+      </ul>
+    </div>
+    <div class="sk-block rev d2">
+      <div class="sk-num">02</div>
+      <div class="sk-cat">Commercial & Négociation</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Négociation avancée</span><span class="sk-pct">95%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="95"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Fidélisation client</span><span class="sk-pct">88%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="88"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Prospection digitale</span><span class="sk-pct">80%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="80"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Veille concurrentielle</span><span class="sk-pct">85%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="85"></div></div></li>
+      </ul>
+    </div>
+    <div class="sk-block rev d3">
+      <div class="sk-num">03</div>
+      <div class="sk-cat">Design & Créativité</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Adobe Photoshop</span><span class="sk-pct">71%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="71"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Canva</span><span class="sk-pct">86%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="86"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Premiere Pro</span><span class="sk-pct">63%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="63"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Brand & Identité visuelle</span><span class="sk-pct">78%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="78"></div></div></li>
+      </ul>
+    </div>
+    <div class="sk-block rev d1">
+      <div class="sk-num">04</div>
+      <div class="sk-cat">Digital & IA</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">WordPress / Prestashop</span><span class="sk-pct">77%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="77"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Outils IA (création web)</span><span class="sk-pct">85%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="85"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Automatisation</span><span class="sk-pct">72%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="72"></div></div></li>
+      </ul>
+    </div>
+    <div class="sk-block rev d2">
+      <div class="sk-num">05</div>
+      <div class="sk-cat">Marketing & Brand</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Stratégie de marque</span><span class="sk-pct">80%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="80"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Réseaux sociaux</span><span class="sk-pct">83%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="83"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Positionnement & image</span><span class="sk-pct">78%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="78"></div></div></li>
+      </ul>
+    </div>
+    <div class="sk-block rev d3">
+      <div class="sk-num">06</div>
+      <div class="sk-cat">Soft Skills</div>
+      <ul class="sk-list">
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Leadership & initiative</span><span class="sk-pct">90%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="90"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Adaptabilité</span><span class="sk-pct">95%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="95"></div></div></li>
+        <li class="sk-item"><div class="sk-item-top"><span class="sk-label">Autodidaxie & curiosité</span><span class="sk-pct">92%</span></div><div class="sk-bar-wrap"><div class="sk-bar" data-w="92"></div></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ACHIEVEMENTS ═══ -->
+
+<section id="achievements">
+  <div class="s-head rev">
+    <div class="s-num">04</div>
+    <h2 class="s-title">Réali<em>sations</em></h2>
+    <div class="s-rule"></div>
+  </div>
+  <div class="ach-grid">
+    <div class="ach-card rev d1">
+      <span class="ach-ico">🏆</span>
+      <span class="ach-counter" data-count="1" data-suffix="er">0</span>
+      <div class="ach-title">Journée de la Négociation</div>
+      <div class="ach-desc">Classé 1er sur 60 participants lors d'un concours national de négociation — démontrant une maîtrise technique et une intelligence situationnelle hors pair.</div>
+      <div class="ach-badge">Concours · 60 participants</div>
+    </div>
+    <div class="ach-card rev d2">
+      <span class="ach-ico">🏦</span>
+      <span class="ach-counter" data-count="4" data-suffix=" ans">0</span>
+      <div class="ach-title">Parcours Terrain Accéléré</div>
+      <div class="ach-desc">De l'immobilier à la banque (LCL) jusqu'au Master patrimoine : progression multi-sectorielle rapide témoignant d'une forte adaptabilité et d'une vision stratégique claire.</div>
+      <div class="ach-badge">Progression · Finance · Immo</div>
+    </div>
+    <div class="ach-card rev d3">
+      <span class="ach-ico">🎓</span>
+      <span class="ach-counter" data-count="20" data-suffix=" ans">0</span>
+      <div class="ach-title">Bac Pro Mention Très Bien</div>
+      <div class="ach-desc">Obtention du Bac Pro Métiers du Commerce et de la Vente avec la mention Très Bien. Preuve d'une rigueur académique constante depuis le début du parcours.</div>
+      <div class="ach-badge">Excellence académique</div>
+    </div>
+    <div class="ach-card rev d4">
+      <span class="ach-ico">⚡</span>
+      <span class="ach-counter" data-count="3" data-suffix=" secteurs">0</span>
+      <div class="ach-title">Profil Triple Compétence</div>
+      <div class="ach-desc">Finance · Design · Tech & IA — une combinaison rare sur le marché, opérant à l'intersection de la stratégie patrimoniale, de l'image de marque et des leviers digitaux.</div>
+      <div class="ach-badge">Profil hybride & différenciant</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CONTACT ═══ -->
+
+<section id="contact">
+  <div class="ct-grid">
+    <div class="rev">
+      <div class="s-head">
+        <div class="s-num">05</div>
+        <h2 class="s-title">Travaillons <em>ensemble</em></h2>
+        <div class="s-rule"></div>
+      </div>
+      <p class="ct-headline">Une opportunité<br>à saisir ?<br><em>Parlons-en.</em></p>
+      <div class="ct-info">
+        <div class="ct-item"><div class="ct-ico">✉</div><span>Bertrand.charles.pro@gmail.com</span></div>
+        <div class="ct-item"><div class="ct-ico">☎</div><span>07 76 69 33 68</span></div>
+        <div class="ct-item"><div class="ct-ico">◎</div><span>Lyon, Rhône-Alpes · Mobilité nationale</span></div>
+        <div class="ct-item"><div class="ct-ico">🪪</div><span>Permis B · Véhiculé</span></div>
+      </div>
+      <div class="ct-avail"><div class="ct-dot"></div>Disponible pour opportunités</div>
+    </div>
+    <div class="rev d2">
+      <div id="f-form">
+        <div class="f-field"><label class="f-lbl">Votre nom</label><input type="text" class="f-inp" placeholder="Jean Dupont" id="f-name"></div>
+        <div class="f-field"><label class="f-lbl">Votre email</label><input type="email" class="f-inp" placeholder="jean@entreprise.com" id="f-email"></div>
+        <div class="f-field"><label class="f-lbl">Objet</label><input type="text" class="f-inp" placeholder="CDI · Alternance · Collaboration · Stage"></div>
+        <div class="f-field"><label class="f-lbl">Message</label><textarea class="f-inp" placeholder="Décrivez votre opportunité..."></textarea></div>
+        <button class="f-btn" onclick="sendForm()"><span>Envoyer le message →</span></button>
+      </div>
+      <div id="f-ok"><span class="f-ok-icon">✓</span><div class="f-ok-txt">Message envoyé.<br>Je vous recontacte sous 24h.</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-logo">CB</div>
+  <div class="ft-copy">© 2025 Charles Bertrand</div>
+  <div class="ft-links">
+    <a href="#about">Profil</a>
+    <a href="#skills">Compétences</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+/* ══ CURSOR ══ */
+const cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+let mx=0,my=0,fx=0,fy=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function f(){fx+=(mx-fx)*.1;fy+=(my-fy)*.1;cur2.style.left=fx+'px';cur2.style.top=fy+'px';requestAnimationFrame(f)})();
+document.querySelectorAll('a,button,.sk-block,.ach-card,.tl-card,.acard,.btn-mag').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));
+});
+
+/* ══ SCROLL PROGRESS ══ */
+const prog=document.getElementById('prog');
+window.addEventListener('scroll',()=>{
+  const h=document.body.scrollHeight-window.innerHeight;
+  prog.style.width=(window.scrollY/h*100)+'%';
+  document.getElementById('nav').classList.toggle('stuck',window.scrollY>60);
+});
+
+/* ══ PARTICLE CANVAS ══ */
+const canvas=document.getElementById('canvas');
+const ctx=canvas.getContext('2d');
+let W,H,pts=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+function Pt(){
+  this.x=Math.random()*W;this.y=Math.random()*H;
+  this.vx=(Math.random()-.5)*.35;this.vy=(Math.random()-.5)*.35;
+  this.r=Math.random()*1.4+.3;this.a=Math.random();
+}
+for(let i=0;i<88;i++)pts.push(new Pt());
+(function draw(){
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<pts.length;i++){
+    const p=pts[i];
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(212,168,67,${p.a*.7})`;ctx.fill();
+    for(let j=i+1;j<pts.length;j++){
+      const q=pts[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<130){
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);
+        ctx.strokeStyle=`rgba(212,168,67,${(1-d/130)*.14})`;ctx.lineWidth=.6;ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+})();
+
+/* ══ TYPEWRITER ══ */
+const lines=['De la négociation immobilière aux marchés financiers,','je construis des stratégies qui créent de la valeur.','Finance · Brand · Impact · Digital.'];
+let li=0,ci=0,del=false;
+const typed=document.getElementById('typed');
+function type(){
+  if(!del){
+    typed.textContent=lines[li].slice(0,++ci);
+    if(ci===lines[li].length){del=true;setTimeout(type,1800);return}
+  } else {
+    typed.textContent=lines[li].slice(0,--ci);
+    if(ci===0){del=false;li=(li+1)%lines.length}
+  }
+  setTimeout(type,del?32:52);
+}
+setTimeout(type,1600);
+
+/* ══ STAT COUNTERS (hero) ══ */
+function animCount(el){
+  const target=+el.dataset.count,suf=el.dataset.suffix||'';
+  let cur=0;const step=Math.ceil(target/30);
+  const iv=setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=cur+suf;if(cur>=target)clearInterval(iv)},40);
+}
+const statObs=new IntersectionObserver(ent=>{ent.forEach(e=>{if(e.isIntersecting){document.querySelectorAll('.stat-n').forEach(animCount);statObs.disconnect()}})},{threshold:.5});
+document.querySelector('.h-stats')&&statObs.observe(document.querySelector('.h-stats'));
+
+/* ══ ACH COUNTERS ══ */
+const achObs=new IntersectionObserver(ent=>{ent.forEach(e=>{if(e.isIntersecting){
+  e.target.querySelectorAll('.ach-counter').forEach(el=>{
+    const target=+el.dataset.count,suf=el.dataset.suffix||'';
+    let c=0;const iv=setInterval(()=>{c=Math.min(c+1,target);el.textContent=c+suf;if(c>=target)clearInterval(iv)},60);
+  });
+  achObs.unobserve(e.target);
+}})},{threshold:.3});
+document.querySelectorAll('.ach-card').forEach(c=>achObs.observe(c));
+
+/* ══ REVEAL ══ */
+const revObs=new IntersectionObserver(ent=>{ent.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:.08});
+document.querySelectorAll('.rev,.tl-item').forEach(el=>revObs.observe(el));
+
+/* ══ SKILL BARS ══ */
+const barObs=new IntersectionObserver(ent=>{ent.forEach(e=>{if(e.isIntersecting){
+  e.target.querySelectorAll('.sk-bar').forEach(b=>b.style.width=b.dataset.w+'%');
+  barObs.unobserve(e.target);
+}})},{threshold:.3});
+document.querySelectorAll('.sk-block').forEach(b=>barObs.observe(b));
+
+/* ══ 3D TILT ══ */
+document.querySelectorAll('.tl-card,.ach-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(700px) rotateY(${x*10}deg) rotateX(${-y*8}deg) translateY(-6px)`;
+  });
+  card.addEventListener('mouseleave',()=>card.style.transform='');
+});
+
+/* ══ MAGNETIC BUTTONS ══ */
+document.querySelectorAll('.btn-mag').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+    const r=btn.getBoundingClientRect();
+    const x=(e.clientX-r.left-r.width/2)*.25;
+    const y=(e.clientY-r.top-r.height/2)*.25;
+    btn.style.transform=`translate(${x}px,${y}px)`;
+  });
+  btn.addEventListener('mouseleave',()=>btn.style.transform='');
+});
+
+/* ══ FORM ══ */
+function sendForm(){
+  const n=document.getElementById('f-name').value.trim();
+  const e=document.getElementById('f-email').value.trim();
+  if(!n||!e){alert('Merci de remplir votre nom et votre email.');return}
+  document.getElementById('f-form').style.display='none';
+  document.getElementById('f-ok').style.display='block';
+}
+</script>
+
+</body>
+</html>
