@@ -6,7 +6,7 @@
 
 ## 🔗 Voir le site en ligne
 
-[**[charlo69-brt.github.io](https://charlo69-brt.github.io)**](https://charlo69-brt.github.io/charlesbertrand/)
+(https://charlo69-brt.github.io/charlesbertrand/)
 
 -----
 
