@@ -4,9 +4,9 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 function getBreadcrumbs(pathname: string): { label: string; href?: string }[] {
-  const segments = pathname.replace('/simulator', '').split('/').filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
   const crumbs: { label: string; href?: string }[] = [
-    { label: 'PatriSim', href: '/simulator' },
+    { label: 'PatriSim', href: '/' },
   ];
 
   const labelMap: Record<string, string> = {
@@ -20,7 +20,7 @@ function getBreadcrumbs(pathname: string): { label: string; href?: string }[] {
     parametres: 'Paramètres',
   };
 
-  let path = '/simulator';
+  let path = '';
   for (const segment of segments) {
     path += `/${segment}`;
     const label = labelMap[segment] || segment;

@@ -55,6 +55,10 @@ export default function BilanPage() {
       <div className="mt-6">
         {activeTab === 'synthese' && (
           <BilanDashboard
+            actifs={bilan.actifs}
+            passifs={bilan.passifs}
+            revenus={bilan.revenus}
+            charges={bilan.charges}
             totalActifsImmobilier={totalActifsImmobilier}
             totalActifsFinancier={totalActifsFinancier}
             totalActifsProfessionnel={totalActifsProfessionnel}
@@ -63,7 +67,6 @@ export default function BilanPage() {
             patrimoineNet={patrimoineNet}
             totalRevenus={totalRevenus}
             totalCharges={totalCharges}
-            revenus={bilan.revenus}
           />
         )}
         {activeTab === 'actifs' && <ActifsForm actifs={bilan.actifs} onChange={updateActifs} />}

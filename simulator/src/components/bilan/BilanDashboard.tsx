@@ -1,13 +1,17 @@
 'use client';
 
-import { formatEuro } from '@/lib/utils';
-import { Revenus } from '@/lib/types';
+import { Actifs, Passifs, Revenus, Charges } from '@/lib/types';
 import Card from '@/components/ui/Card';
 import PatrimoinePieChart from '@/components/charts/PatrimoinePieChart';
 import BilanSummaryChart from '@/components/charts/BilanSummaryChart';
 import RevenusBarChart from '@/components/charts/RevenusBarChart';
+import PatrimoineMap from '@/components/bilan/PatrimoineMap';
 
 interface BilanDashboardProps {
+  actifs: Actifs;
+  passifs: Passifs;
+  revenus: Revenus;
+  charges: Charges;
   totalActifsImmobilier: number;
   totalActifsFinancier: number;
   totalActifsProfessionnel: number;
@@ -16,43 +20,30 @@ interface BilanDashboardProps {
   patrimoineNet: number;
   totalRevenus: number;
   totalCharges: number;
-  revenus: Revenus;
 }
 
 export default function BilanDashboard(props: BilanDashboardProps) {
   const {
+    actifs, passifs, revenus, charges,
     totalActifsImmobilier, totalActifsFinancier, totalActifsProfessionnel,
     totalActifs, totalPassifs, patrimoineNet,
-    totalRevenus, totalCharges, revenus,
+    totalRevenus, totalCharges,
   } = props;
-
-  const capaciteEpargne = totalRevenus - totalCharges;
 
   return (
     <div className="space-y-6">
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Total actifs</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{formatEuro(totalActifs)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Total passifs</p>
-          <p className="text-2xl font-bold text-red-600 mt-1">{formatEuro(totalPassifs)}</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Patrimoine net</p>
-          <p className={`text-2xl font-bold mt-1 ${patrimoineNet >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatEuro(patrimoineNet)}
-          </p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide">Capacité d&apos;épargne</p>
-          <p className={`text-2xl font-bold mt-1 ${capaciteEpargne >= 0 ? 'text-blue-900' : 'text-red-600'}`}>
-            {formatEuro(capaciteEpargne)}
-          </p>
-        </div>
-      </div>
+      {/* Cartographie patrimoniale */}
+      <PatrimoineMap
+        actifs={actifs}
+        passifs={passifs}
+        revenus={revenus}
+        charges={charges}
+        totalActifs={totalActifs}
+        totalPassifs={totalPassifs}
+        patrimoineNet={patrimoineNet}
+        totalRevenus={totalRevenus}
+        totalCharges={totalCharges}
+      />
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
