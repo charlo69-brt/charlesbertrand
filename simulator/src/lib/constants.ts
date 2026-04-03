@@ -1,28 +1,37 @@
-// Barème IR 2026 (revenus 2025) - revalorisation ~2%
+// Barème IR 2026 (revenus 2025) - revalorisation +0,9%
 export const BAREME_IR_2026 = [
-  { min: 0, max: 11727, taux: 0 },
-  { min: 11727, max: 29901, taux: 0.11 },
-  { min: 29901, max: 85500, taux: 0.30 },
-  { min: 85500, max: 183900, taux: 0.41 },
-  { min: 183900, max: Infinity, taux: 0.45 },
+  { min: 0, max: 11497, taux: 0 },
+  { min: 11497, max: 29315, taux: 0.11 },
+  { min: 29315, max: 83823, taux: 0.30 },
+  { min: 83823, max: 180294, taux: 0.41 },
+  { min: 180294, max: Infinity, taux: 0.45 },
 ];
 
 // Quotient familial
-export const PLAFOND_QF_DEMI_PART = 1791;
-export const ABATTEMENT_10_POURCENT_MIN = 504;
-export const ABATTEMENT_10_POURCENT_MAX = 14454;
+export const PLAFOND_QF_DEMI_PART = 1807;
+export const ABATTEMENT_10_POURCENT_MIN = 509;
+export const ABATTEMENT_10_POURCENT_MAX = 14555;
 
-// Décote IR
-export const DECOTE_SEUIL_CELIBATAIRE = 1965;
-export const DECOTE_SEUIL_COUPLE = 3250;
+// Décote IR 2026
+export const DECOTE_SEUIL_CELIBATAIRE = 1982;
+export const DECOTE_SEUIL_COUPLE = 3277;
+export const DECOTE_COEFFICIENT = 0.4525;
+export const DECOTE_MONTANT_CELIBATAIRE = 897;
+export const DECOTE_MONTANT_COUPLE = 1470;
 
-// Prélèvements sociaux
-export const TAUX_PRELEVEMENTS_SOCIAUX = 0.172;
+// Prélèvements sociaux 2026
+// LFSS 2026 : hausse CSG de 1,4 point sur revenus du capital (sauf AV, vieux PEL/CEL)
+export const TAUX_PRELEVEMENTS_SOCIAUX = 0.186; // 18,6% sur revenus du capital (dividendes, PV, épargne)
+export const TAUX_PRELEVEMENTS_SOCIAUX_AV = 0.172; // 17,2% sur assurance-vie, PEL ancien, CEL ancien
+export const TAUX_PRELEVEMENTS_SOCIAUX_FONCIER = 0.172; // 17,2% sur revenus fonciers (location nue)
 export const TAUX_CSG_DEDUCTIBLE = 0.068;
-export const TAUX_PFU = 0.30;
-export const TAUX_PFU_IR = 0.128;
 
-// IFI
+// PFU 2026 (12,8% IR + prélèvements sociaux)
+export const TAUX_PFU = 0.314; // 31,4% pour revenus mobiliers classiques
+export const TAUX_PFU_AV = 0.30; // 30% pour assurance-vie
+export const TAUX_PFU_IR = 0.128; // Part IR du PFU (inchangée)
+
+// IFI (inchangé en 2026)
 export const IFI_SEUIL = 1300000;
 export const IFI_DECOTE_SEUIL = 1400000;
 export const ABATTEMENT_RP_IFI = 0.30;
@@ -36,7 +45,7 @@ export const BAREME_IFI = [
   { min: 10000000, max: Infinity, taux: 0.015 },
 ];
 
-// Succession - Ligne directe
+// Succession - Ligne directe (inchangé)
 export const BAREME_SUCCESSION_LIGNE_DIRECTE = [
   { min: 0, max: 8072, taux: 0.05 },
   { min: 8072, max: 12109, taux: 0.10 },
@@ -71,8 +80,8 @@ export const AV_SEUIL_HAUT_AVANT_70 = 700000;
 export const AV_ABATTEMENT_RACHAT_8ANS_SOLO = 4600;
 export const AV_ABATTEMENT_RACHAT_8ANS_COUPLE = 9200;
 
-// Pinel - dispositif terminé au 31/12/2024
-// Conservé pour les engagements en cours
+// Pinel - dispositif terminé au 31/12/2024, remplacé par Jeanbrun (21/02/2026)
+// Conservé pour les engagements Pinel en cours
 export const PINEL_TAUX: Record<number, number> = {
   6: 0.09,
   9: 0.12,
@@ -85,15 +94,16 @@ export const PINEL_PLAFOND_M2 = 5500;
 export const DEFICIT_FONCIER_PLAFOND = 10700;
 
 // Retraite
-export const RETRAITE_AGE_LEGAL = 64;
+// LFSS 2026 : gel partiel montée en charge pour générations 1964-1965
+export const RETRAITE_AGE_LEGAL = 64; // Cible finale, mais gel partiel 2026
 export const RETRAITE_TRIMESTRES_REQUIS = 172; // Génération 1965+
 export const RETRAITE_TAUX_PLEIN = 0.50;
 export const RETRAITE_DECOTE_PAR_TRIMESTRE = 0.00625; // 0.625%
 export const RETRAITE_SURCOTE_PAR_TRIMESTRE = 0.0125; // 1.25%
-export const PASS_2026 = 47484;
+export const PASS_2026 = 48060; // Arrêté du 22/12/2025, JORF 23/12/2025
 export const PLAFOND_PER_DEDUCTION_TAUX = 0.10;
 
-// Démembrement - Barème fiscal article 669 CGI
+// Démembrement - Barème fiscal article 669 CGI (inchangé)
 export const BAREME_USUFRUIT_FISCAL = [
   { ageMin: 0, ageMax: 21, usufruit: 0.90 },
   { ageMin: 21, ageMax: 31, usufruit: 0.80 },

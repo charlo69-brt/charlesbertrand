@@ -6,7 +6,11 @@ import {
   ABATTEMENT_10_POURCENT_MAX,
   DECOTE_SEUIL_CELIBATAIRE,
   DECOTE_SEUIL_COUPLE,
+  DECOTE_COEFFICIENT,
+  DECOTE_MONTANT_CELIBATAIRE,
+  DECOTE_MONTANT_COUPLE,
   TAUX_PRELEVEMENTS_SOCIAUX,
+  TAUX_PRELEVEMENTS_SOCIAUX_FONCIER,
   TAUX_PFU,
 } from '../constants';
 import { calculerNombreParts, calculerDemiPartsSupplementaires } from './quotient-familial';
@@ -110,11 +114,8 @@ export function calculerIR(
   const seuilDecote = isCouple ? DECOTE_SEUIL_COUPLE : DECOTE_SEUIL_CELIBATAIRE;
 
   if (impotBrut > 0 && impotBrut < seuilDecote) {
-    if (isCouple) {
-      decote = Math.round(1444 - 0.4525 * impotBrut);
-    } else {
-      decote = Math.round(873 - 0.4525 * impotBrut);
-    }
+    const montantDecote = isCouple ? DECOTE_MONTANT_COUPLE : DECOTE_MONTANT_CELIBATAIRE;
+    decote = Math.round(montantDecote - DECOTE_COEFFICIENT * impotBrut);
     decote = Math.max(0, Math.min(decote, impotBrut));
   }
 
@@ -124,9 +125,11 @@ export function calculerIR(
   const tauxMarginalImposition = getTMI(quotient);
   const tauxMoyenImposition = revenuNetImposable > 0 ? impotNet / revenuNetImposable : 0;
 
-  // 9. Prélèvements sociaux (sur revenus du patrimoine)
-  const revenusPatrimoine = revenus.revenusFonciers + revenus.revenusMobiliers;
-  const prelevementsSociaux = Math.round(revenusPatrimoine * TAUX_PRELEVEMENTS_SOCIAUX);
+  // 9. Prélèvements sociaux (taux différenciés 2026)
+  // Revenus fonciers : 17,2% / Revenus mobiliers : 18,6%
+  const psFoncier = Math.round(revenus.revenusFonciers * TAUX_PRELEVEMENTS_SOCIAUX_FONCIER);
+  const psMobilier = Math.round(revenus.revenusMobiliers * TAUX_PRELEVEMENTS_SOCIAUX);
+  const prelevementsSociaux = psFoncier + psMobilier;
 
   // 10. PFU sur revenus mobiliers
   const pfuCapital = Math.round(revenus.revenusMobiliers * TAUX_PFU);

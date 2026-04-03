@@ -2,7 +2,8 @@ import { SimulationAssuranceVie, ProjectionAnnuelle } from '../types';
 import {
   AV_ABATTEMENT_RACHAT_8ANS_SOLO,
   AV_ABATTEMENT_RACHAT_8ANS_COUPLE,
-  TAUX_PFU,
+  TAUX_PFU_AV,
+  TAUX_PRELEVEMENTS_SOCIAUX_AV,
 } from '../constants';
 
 export function simulerAssuranceVie(
@@ -42,14 +43,14 @@ export function simulerAssuranceVie(
 
   // Fiscalité en cas de rachat total
   const fiscaliteAvant8ans = {
-    pfu: Math.round(plusValue * TAUX_PFU),
+    pfu: Math.round(plusValue * TAUX_PFU_AV), // 30% pour AV (17,2% PS + 12,8% IR)
   };
 
   const abattement = isCouple ? AV_ABATTEMENT_RACHAT_8ANS_COUPLE : AV_ABATTEMENT_RACHAT_8ANS_SOLO;
   const plusValueApresAbattement = Math.max(0, plusValue - abattement);
   const fiscaliteApres8ans = {
     apresAbattement: plusValueApresAbattement,
-    impot: Math.round(plusValueApresAbattement * 0.248), // 7.5% IR + 17.2% PS
+    impot: Math.round(plusValueApresAbattement * (0.075 + TAUX_PRELEVEMENTS_SOCIAUX_AV)), // 7,5% IR + 17,2% PS
   };
 
   return {
