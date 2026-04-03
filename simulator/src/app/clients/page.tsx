@@ -18,7 +18,7 @@ export default function ClientsPage() {
           <p className="text-sm text-gray-500 mt-1">{clients.length} client{clients.length !== 1 ? 's' : ''} enregistré{clients.length !== 1 ? 's' : ''}</p>
         </div>
         {clients.length > 0 && (
-          <Button onClick={() => router.push('/simulator/clients/nouveau')}>
+          <Button onClick={() => router.push('/clients/nouveau')}>
             + Nouveau client
           </Button>
         )}
@@ -29,7 +29,7 @@ export default function ClientsPage() {
           title="Aucun client"
           description="Commencez par créer votre premier client pour accéder aux outils de simulation patrimoniale."
           actionLabel="Créer un client"
-          onAction={() => router.push('/simulator/clients/nouveau')}
+          onAction={() => router.push('/clients/nouveau')}
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

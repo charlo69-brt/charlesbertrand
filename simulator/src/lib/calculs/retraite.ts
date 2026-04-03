@@ -5,7 +5,7 @@ import {
   RETRAITE_TAUX_PLEIN,
   RETRAITE_DECOTE_PAR_TRIMESTRE,
   RETRAITE_SURCOTE_PAR_TRIMESTRE,
-  PASS_2025,
+  PASS_2026,
 } from '../constants';
 
 export function simulerRetraite(
@@ -36,7 +36,7 @@ export function simulerRetraite(
 
   // SAM (Salaire Annuel Moyen) - simplifié: basé sur le salaire actuel
   // Plafonné au PASS
-  const salairePlafonne = Math.min(salaireAnnuelBrut, PASS_2025);
+  const salairePlafonne = Math.min(salaireAnnuelBrut, PASS_2026);
   const sam = salairePlafonne; // Simplified: using current salary as SAM approximation
 
   // Pension régime général

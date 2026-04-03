@@ -19,7 +19,7 @@ const tabs = [
 
 export default function ClientSubNav({ clientId }: ClientSubNavProps) {
   const pathname = usePathname();
-  const basePath = `/simulator/clients/${clientId}`;
+  const basePath = `/clients/${clientId}`;
 
   return (
     <div className="border-b border-gray-200 bg-white -mx-6 px-6 mb-6">

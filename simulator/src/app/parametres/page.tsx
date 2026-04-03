@@ -93,7 +93,7 @@ export default function ParametresPage() {
       <Card title="Informations">
         <div className="text-sm text-gray-600 space-y-2">
           <p><strong>Version :</strong> 1.0.0</p>
-          <p><strong>Fiscalité :</strong> Loi de Finances 2025 (revenus 2024)</p>
+          <p><strong>Fiscalité :</strong> Loi de Finances 2026 (revenus 2025)</p>
           <p><strong>Stockage :</strong> Données locales (navigateur)</p>
           <p><strong>Développé par :</strong> Charles Bertrand</p>
         </div>

@@ -34,7 +34,7 @@ export default function RetraitePage() {
     return (
       <div className="text-center py-16">
         <h2 className="text-xl font-semibold text-gray-900">Client introuvable</h2>
-        <Button className="mt-4" onClick={() => router.push('/simulator/clients')}>Retour</Button>
+        <Button className="mt-4" onClick={() => router.push('/clients')}>Retour</Button>
       </div>
     );
   }

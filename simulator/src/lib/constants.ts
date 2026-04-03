@@ -1,20 +1,20 @@
-// Barème IR 2025 (revenus 2024)
-export const BAREME_IR_2025 = [
-  { min: 0, max: 11497, taux: 0 },
-  { min: 11497, max: 29315, taux: 0.11 },
-  { min: 29315, max: 83823, taux: 0.30 },
-  { min: 83823, max: 180294, taux: 0.41 },
-  { min: 180294, max: Infinity, taux: 0.45 },
+// Barème IR 2026 (revenus 2025) - revalorisation ~2%
+export const BAREME_IR_2026 = [
+  { min: 0, max: 11727, taux: 0 },
+  { min: 11727, max: 29901, taux: 0.11 },
+  { min: 29901, max: 85500, taux: 0.30 },
+  { min: 85500, max: 183900, taux: 0.41 },
+  { min: 183900, max: Infinity, taux: 0.45 },
 ];
 
 // Quotient familial
-export const PLAFOND_QF_DEMI_PART = 1759;
-export const ABATTEMENT_10_POURCENT_MIN = 495;
-export const ABATTEMENT_10_POURCENT_MAX = 14171;
+export const PLAFOND_QF_DEMI_PART = 1791;
+export const ABATTEMENT_10_POURCENT_MIN = 504;
+export const ABATTEMENT_10_POURCENT_MAX = 14454;
 
 // Décote IR
-export const DECOTE_SEUIL_CELIBATAIRE = 1929;
-export const DECOTE_SEUIL_COUPLE = 3191;
+export const DECOTE_SEUIL_CELIBATAIRE = 1965;
+export const DECOTE_SEUIL_COUPLE = 3250;
 
 // Prélèvements sociaux
 export const TAUX_PRELEVEMENTS_SOCIAUX = 0.172;
@@ -71,7 +71,8 @@ export const AV_SEUIL_HAUT_AVANT_70 = 700000;
 export const AV_ABATTEMENT_RACHAT_8ANS_SOLO = 4600;
 export const AV_ABATTEMENT_RACHAT_8ANS_COUPLE = 9200;
 
-// Pinel (post-2023)
+// Pinel - dispositif terminé au 31/12/2024
+// Conservé pour les engagements en cours
 export const PINEL_TAUX: Record<number, number> = {
   6: 0.09,
   9: 0.12,
@@ -89,7 +90,7 @@ export const RETRAITE_TRIMESTRES_REQUIS = 172; // Génération 1965+
 export const RETRAITE_TAUX_PLEIN = 0.50;
 export const RETRAITE_DECOTE_PAR_TRIMESTRE = 0.00625; // 0.625%
 export const RETRAITE_SURCOTE_PAR_TRIMESTRE = 0.0125; // 1.25%
-export const PASS_2025 = 46368;
+export const PASS_2026 = 47484;
 export const PLAFOND_PER_DEDUCTION_TAUX = 0.10;
 
 // Démembrement - Barème fiscal article 669 CGI

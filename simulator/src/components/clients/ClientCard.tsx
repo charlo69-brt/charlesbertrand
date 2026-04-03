@@ -14,7 +14,7 @@ export default function ClientCard({ client }: ClientCardProps) {
 
   return (
     <Link
-      href={`/simulator/clients/${client.id}`}
+      href={`/clients/${client.id}`}
       className="block bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all p-5"
     >
       <div className="flex items-start justify-between">

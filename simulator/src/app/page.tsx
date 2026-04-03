@@ -41,7 +41,7 @@ export default function Dashboard() {
     },
     {
       label: 'Loi de Finances',
-      value: '2025',
+      value: '2026',
       icon: (
         <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -90,7 +90,7 @@ export default function Dashboard() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
         <p className="mt-1 text-gray-500">
-          Bienvenue sur PatriSim, votre simulateur patrimonial conforme à la Loi de Finances 2025
+          Bienvenue sur PatriSim, votre simulateur patrimonial conforme à la Loi de Finances 2026
         </p>
       </div>
 
@@ -192,7 +192,7 @@ export default function Dashboard() {
           <li>• Toutes les données sont stockées localement dans votre navigateur (localStorage)</li>
           <li>• Aucune donnée n&apos;est envoyée sur un serveur - confidentialité totale</li>
           <li>• Exportez/importez vos données depuis la page Paramètres</li>
-          <li>• Barèmes et calculs conformes à la Loi de Finances 2025</li>
+          <li>• Barèmes et calculs conformes à la Loi de Finances 2026</li>
         </ul>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { Revenus, SituationFamiliale, ResultatIR, DetailTranche } from '../types';
 import {
-  BAREME_IR_2025,
+  BAREME_IR_2026,
   PLAFOND_QF_DEMI_PART,
   ABATTEMENT_10_POURCENT_MIN,
   ABATTEMENT_10_POURCENT_MAX,
@@ -15,7 +15,7 @@ function appliquerBareme(quotient: number): { impot: number; detailParTranche: D
   let impot = 0;
   const detailParTranche: DetailTranche[] = [];
 
-  for (const tranche of BAREME_IR_2025) {
+  for (const tranche of BAREME_IR_2026) {
     if (quotient <= tranche.min) break;
 
     const montantDansTranche = Math.min(quotient, tranche.max) - tranche.min;
@@ -37,7 +37,7 @@ function appliquerBareme(quotient: number): { impot: number; detailParTranche: D
 
 function getTMI(quotient: number): number {
   let tmi = 0;
-  for (const tranche of BAREME_IR_2025) {
+  for (const tranche of BAREME_IR_2026) {
     if (quotient > tranche.min) {
       tmi = tranche.taux;
     }

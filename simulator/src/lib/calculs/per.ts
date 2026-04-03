@@ -1,5 +1,5 @@
 import { SimulationPER, ProjectionAnnuelle } from '../types';
-import { PLAFOND_PER_DEDUCTION_TAUX, PASS_2025 } from '../constants';
+import { PLAFOND_PER_DEDUCTION_TAUX, PASS_2026 } from '../constants';
 
 export function simulerPER(
   versementAnnuel: number,
@@ -11,7 +11,7 @@ export function simulerPER(
   // Plafond déduction: 10% des revenus professionnels, plafonné à 10% de 8*PASS
   const plafondDeduction = Math.min(
     revenuProfessionnel * PLAFOND_PER_DEDUCTION_TAUX,
-    8 * PASS_2025 * PLAFOND_PER_DEDUCTION_TAUX
+    8 * PASS_2026 * PLAFOND_PER_DEDUCTION_TAUX
   );
 
   const versementDeductible = Math.min(versementAnnuel, plafondDeduction);

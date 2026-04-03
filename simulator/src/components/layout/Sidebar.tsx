@@ -6,7 +6,7 @@ import clsx from 'clsx';
 
 const navItems = [
   {
-    href: '/simulator',
+    href: '/',
     label: 'Tableau de bord',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -15,7 +15,7 @@ const navItems = [
     ),
   },
   {
-    href: '/simulator/clients',
+    href: '/clients',
     label: 'Clients',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -24,7 +24,7 @@ const navItems = [
     ),
   },
   {
-    href: '/simulator/parametres',
+    href: '/parametres',
     label: 'Paramètres',
     icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -47,7 +47,7 @@ export default function Sidebar() {
 
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== '/simulator' && pathname?.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
           return (
             <Link
               key={item.href}
@@ -67,7 +67,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-4 py-4 border-t border-blue-800">
-        <p className="text-xs text-blue-400">Loi de Finances 2025</p>
+        <p className="text-xs text-blue-400">Loi de Finances 2026</p>
         <p className="text-xs text-blue-500 mt-0.5">Fiscalité à jour</p>
       </div>
     </aside>

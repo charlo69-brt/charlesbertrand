@@ -16,9 +16,9 @@ export default function NouveauClientPage() {
         <ClientForm
           onSubmit={(data) => {
             const client = addClient(data);
-            router.push(`/simulator/clients/${client.id}`);
+            router.push(`/clients/${client.id}`);
           }}
-          onCancel={() => router.push('/simulator/clients')}
+          onCancel={() => router.push('/clients')}
         />
       </Card>
     </div>

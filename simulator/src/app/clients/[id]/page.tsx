@@ -25,7 +25,7 @@ export default function ClientDetailPage() {
       <div className="text-center py-16">
         <h2 className="text-xl font-semibold text-gray-900">Client introuvable</h2>
         <p className="text-gray-500 mt-2">Ce client n&apos;existe pas ou a été supprimé.</p>
-        <Button className="mt-4" onClick={() => router.push('/simulator/clients')}>
+        <Button className="mt-4" onClick={() => router.push('/clients')}>
           Retour aux clients
         </Button>
       </div>
@@ -87,7 +87,7 @@ export default function ClientDetailPage() {
             variant="danger"
             onClick={() => {
               deleteClient(clientId);
-              router.push('/simulator/clients');
+              router.push('/clients');
             }}
           >
             Supprimer
