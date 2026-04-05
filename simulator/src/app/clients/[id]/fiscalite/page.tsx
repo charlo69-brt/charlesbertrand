@@ -10,9 +10,11 @@ import Tabs from '@/components/ui/Tabs';
 import Button from '@/components/ui/Button';
 import IRSimulator from '@/components/fiscalite/IRSimulator';
 import IFISimulator from '@/components/fiscalite/IFISimulator';
+import ComparateurRCM from '@/components/fiscalite/ComparateurRCM';
 
 const tabs = [
   { id: 'ir', label: 'Impôt sur le revenu' },
+  { id: 'rcm', label: 'RCM : PFU vs IR' },
   { id: 'ifi', label: 'IFI' },
 ];
 
@@ -45,6 +47,13 @@ export default function FiscalitePage() {
       <div className="mt-6">
         {activeTab === 'ir' && (
           <IRSimulator
+            revenus={bilan.revenus}
+            situation={client.situationFamiliale}
+            enfantsACharge={client.enfantsACharge}
+          />
+        )}
+        {activeTab === 'rcm' && (
+          <ComparateurRCM
             revenus={bilan.revenus}
             situation={client.situationFamiliale}
             enfantsACharge={client.enfantsACharge}

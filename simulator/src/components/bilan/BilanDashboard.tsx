@@ -24,7 +24,7 @@ interface BilanDashboardProps {
 
 export default function BilanDashboard(props: BilanDashboardProps) {
   const {
-    actifs, passifs, revenus, charges,
+    actifs, passifs, revenus,
     totalActifsImmobilier, totalActifsFinancier, totalActifsProfessionnel,
     totalActifs, totalPassifs, patrimoineNet,
     totalRevenus, totalCharges,
@@ -36,8 +36,6 @@ export default function BilanDashboard(props: BilanDashboardProps) {
       <PatrimoineMap
         actifs={actifs}
         passifs={passifs}
-        revenus={revenus}
-        charges={charges}
         totalActifs={totalActifs}
         totalPassifs={totalPassifs}
         patrimoineNet={patrimoineNet}

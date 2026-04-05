@@ -89,6 +89,30 @@ export function getTypeActifFinancierLabel(type: string): string {
   return labels[type] || type;
 }
 
+export function getDetentionLabel(mode: string): string {
+  const labels: Record<string, string> = {
+    propre: 'Bien propre',
+    commun: 'Communauté',
+    sci: 'SCI',
+    demembrement_np: 'Nue-propriété',
+    demembrement_usu: 'Usufruit',
+    indivision: 'Indivision',
+  };
+  return labels[mode] || mode;
+}
+
+export function getDetentionEmoji(mode: string): string {
+  const emojis: Record<string, string> = {
+    propre: '👤',
+    commun: '👫',
+    sci: '🏛️',
+    demembrement_np: '📜',
+    demembrement_usu: '🔑',
+    indivision: '🤝',
+  };
+  return emojis[mode] || '📎';
+}
+
 export function getTypeCreditLabel(type: string): string {
   const labels: Record<string, string> = {
     immobilier: 'Crédit immobilier',

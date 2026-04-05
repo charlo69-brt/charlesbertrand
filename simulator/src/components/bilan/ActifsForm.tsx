@@ -1,6 +1,6 @@
 'use client';
 
-import { Actifs, BienImmobilier, ActifFinancier, ActifProfessionnel } from '@/lib/types';
+import { Actifs, BienImmobilier, ActifFinancier, ActifProfessionnel, ModeDetention } from '@/lib/types';
 import { generateId } from '@/lib/utils';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
@@ -26,6 +26,16 @@ const typeFinancierOptions = [
   { value: 'per', label: 'PER' },
   { value: 'pea', label: 'PEA' },
   { value: 'cto', label: 'CTO' },
+];
+
+const detentionOptions = [
+  { value: '', label: '— Mode de détention —' },
+  { value: 'propre', label: '👤 Bien propre' },
+  { value: 'commun', label: '👫 Communauté' },
+  { value: 'sci', label: '🏛️ SCI' },
+  { value: 'demembrement_np', label: '📜 Nue-propriété' },
+  { value: 'demembrement_usu', label: '🔑 Usufruit' },
+  { value: 'indivision', label: '🤝 Indivision' },
 ];
 
 export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
@@ -101,11 +111,13 @@ export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
                   <span className="text-sm font-medium text-gray-700">Bien immobilier</span>
                   <button onClick={() => removeImmobilier(bien.id)} className="text-red-500 hover:text-red-700 text-sm">Supprimer</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <Input label="Libellé" value={bien.label} onChange={(e) => updateImmobilier(bien.id, { label: e.target.value })} />
                   <Select label="Type" value={bien.type} onChange={(e) => updateImmobilier(bien.id, { type: e.target.value as BienImmobilier['type'] })} options={typeBienOptions} />
                   <NumberInput label="Valeur estimée" value={bien.valeur} onChange={(v) => updateImmobilier(bien.id, { valeur: v })} />
                   <NumberInput label="Capital restant dû" value={bien.capitalRestantDu || 0} onChange={(v) => updateImmobilier(bien.id, { capitalRestantDu: v })} />
+                  <Select label="Mode de détention" value={bien.detention || ''} onChange={(e) => updateImmobilier(bien.id, { detention: (e.target.value || undefined) as ModeDetention | undefined })} options={detentionOptions} />
+                  <Input label="Détail détention" value={bien.detentionDetail || ''} onChange={(e) => updateImmobilier(bien.id, { detentionDetail: e.target.value })} placeholder="Ex: SCI Invest, 50% indivision..." />
                   {bien.type === 'locatif' && (
                     <>
                       <NumberInput label="Loyer annuel" value={bien.loyerAnnuel || 0} onChange={(v) => updateImmobilier(bien.id, { loyerAnnuel: v })} />
@@ -131,11 +143,13 @@ export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
                   <span className="text-sm font-medium text-gray-700">Actif financier</span>
                   <button onClick={() => removeFinancier(actif.id)} className="text-red-500 hover:text-red-700 text-sm">Supprimer</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <Input label="Libellé" value={actif.label} onChange={(e) => updateFinancier(actif.id, { label: e.target.value })} />
                   <Select label="Type" value={actif.type} onChange={(e) => updateFinancier(actif.id, { type: e.target.value as ActifFinancier['type'] })} options={typeFinancierOptions} />
                   <NumberInput label="Valeur" value={actif.valeur} onChange={(v) => updateFinancier(actif.id, { valeur: v })} />
                   <NumberInput label="Taux rendement" value={actif.tauxRendement || 0} onChange={(v) => updateFinancier(actif.id, { tauxRendement: v })} suffix="%" />
+                  <Select label="Mode de détention" value={actif.detention || ''} onChange={(e) => updateFinancier(actif.id, { detention: (e.target.value || undefined) as ModeDetention | undefined })} options={detentionOptions} />
+                  <Input label="Détail détention" value={actif.detentionDetail || ''} onChange={(e) => updateFinancier(actif.id, { detentionDetail: e.target.value })} placeholder="Ex: Co-titulaire, démembré..." />
                 </div>
               </div>
             ))}
@@ -155,9 +169,10 @@ export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
                   <span className="text-sm font-medium text-gray-700">Actif professionnel</span>
                   <button onClick={() => removeProfessionnel(actif.id)} className="text-red-500 hover:text-red-700 text-sm">Supprimer</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <Input label="Libellé" value={actif.label} onChange={(e) => updateProfessionnel(actif.id, { label: e.target.value })} />
                   <NumberInput label="Valeur" value={actif.valeur} onChange={(v) => updateProfessionnel(actif.id, { valeur: v })} />
+                  <Select label="Mode de détention" value={actif.detention || ''} onChange={(e) => updateProfessionnel(actif.id, { detention: (e.target.value || undefined) as ModeDetention | undefined })} options={detentionOptions} />
                 </div>
               </div>
             ))}

@@ -3,6 +3,7 @@ export type SituationFamiliale = 'celibataire' | 'marie' | 'pacse' | 'divorce' |
 export type RegimeMatrimonial = 'communaute_legale' | 'separation_biens' | 'communaute_universelle' | 'participation_acquets';
 export type TypeBienImmobilier = 'residence_principale' | 'locatif' | 'scpi';
 export type TypeActifFinancier = 'compte_courant' | 'livret' | 'assurance_vie' | 'per' | 'pea' | 'cto';
+export type ModeDetention = 'propre' | 'commun' | 'sci' | 'demembrement_np' | 'demembrement_usu' | 'indivision';
 
 // ============ CLIENT ============
 export interface Client {
@@ -32,7 +33,8 @@ export interface BienImmobilier {
   loyerAnnuel?: number;
   chargesAnnuelles?: number;
   dateAcquisition?: string;
-  detenuEnSCI?: boolean;
+  detention?: ModeDetention;
+  detentionDetail?: string; // ex: "SCI Bertrand Invest", "50% indivision"
 }
 
 export interface ActifFinancier {
@@ -43,12 +45,16 @@ export interface ActifFinancier {
   versementsMensuels?: number;
   tauxRendement?: number;
   dateOuverture?: string;
+  detention?: ModeDetention;
+  detentionDetail?: string;
 }
 
 export interface ActifProfessionnel {
   id: string;
   label: string;
   valeur: number;
+  detention?: ModeDetention;
+  detentionDetail?: string;
 }
 
 export interface Actifs {
