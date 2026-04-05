@@ -22,8 +22,8 @@ export default function ClientSubNav({ clientId }: ClientSubNavProps) {
   const basePath = `/clients/${clientId}`;
 
   return (
-    <div className="border-b border-gray-200 bg-white -mx-6 px-6 mb-6">
-      <nav className="flex space-x-6 -mb-px overflow-x-auto" aria-label="Client navigation">
+    <div className="border-b border-gray-200 bg-white -mx-4 md:-mx-6 px-4 md:px-6 mb-6">
+      <nav className="flex space-x-4 md:space-x-6 -mb-px overflow-x-auto scrollbar-hide" aria-label="Client navigation">
         {tabs.map((tab) => {
           const href = `${basePath}${tab.path}`;
           const isActive = tab.path === ''

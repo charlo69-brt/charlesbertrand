@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Sidebar from '../components/layout/Sidebar';
-import Header from '../components/layout/Header';
+import LayoutShell from '../components/layout/LayoutShell';
 
 export const metadata: Metadata = {
   title: 'PatriSim - Simulateur Patrimonial',
@@ -12,13 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr">
       <body className="font-sans">
-        <Sidebar />
-        <div className="ml-64 min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 p-6">
-            {children}
-          </main>
-        </div>
+        <LayoutShell>
+          {children}
+        </LayoutShell>
       </body>
     </html>
   );

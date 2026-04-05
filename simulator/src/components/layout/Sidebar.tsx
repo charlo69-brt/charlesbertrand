@@ -1,8 +1,14 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
+
+interface SidebarProps {
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
 
 const navItems = [
   {
@@ -35,14 +41,76 @@ const navItems = [
   },
 ];
 
-export default function Sidebar() {
-  const pathname = usePathname();
-
+// Hamburger icon
+function MenuIcon() {
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-blue-900 text-white flex flex-col z-40">
-      <div className="px-6 py-5 border-b border-blue-800">
-        <h1 className="text-xl font-bold">PatriSim</h1>
-        <p className="text-xs text-blue-300 mt-0.5">Simulateur Patrimonial</p>
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  );
+}
+
+// Collapse/chevron icon
+function CollapseIcon({ collapsed }: { collapsed: boolean }) {
+  return (
+    <svg className={clsx('w-5 h-5 transition-transform', collapsed && 'rotate-180')} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  );
+}
+
+export default function Sidebar({ collapsed, onToggleCollapse }: SidebarProps) {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close mobile menu on navigation
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
+  const sidebarContent = (
+    <>
+      <div className={clsx('border-b border-blue-800', collapsed ? 'px-3 py-4' : 'px-6 py-5')}>
+        <div className="flex items-center justify-between">
+          <div className={clsx(collapsed && 'hidden')}>
+            <h1 className="text-xl font-bold">PatriSim</h1>
+            <p className="text-xs text-blue-300 mt-0.5">Simulateur Patrimonial</p>
+          </div>
+          {collapsed && <span className="text-xl font-bold mx-auto">P</span>}
+          {/* Desktop collapse button */}
+          <button
+            onClick={onToggleCollapse}
+            className="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-blue-800 transition-colors text-blue-300 hover:text-white"
+            title={collapsed ? 'Ouvrir le menu' : 'Fermer le menu'}
+          >
+            <CollapseIcon collapsed={collapsed} />
+          </button>
+          {/* Mobile close button */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-blue-800 transition-colors text-blue-300 hover:text-white"
+          >
+            <CloseIcon />
+          </button>
+        </div>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -53,23 +121,74 @@ export default function Sidebar() {
               key={item.href}
               href={item.href}
               className={clsx(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors',
+                collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5',
                 isActive
                   ? 'bg-blue-800 text-white'
                   : 'text-blue-200 hover:bg-blue-800/50 hover:text-white'
               )}
+              title={collapsed ? item.label : undefined}
             >
               {item.icon}
-              {item.label}
+              <span className={clsx(collapsed && 'hidden')}>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-blue-800">
-        <p className="text-xs text-blue-400">Loi de Finances 2026</p>
-        <p className="text-xs text-blue-500 mt-0.5">Fiscalité à jour</p>
+      <div className={clsx('border-t border-blue-800', collapsed ? 'px-2 py-3 text-center' : 'px-4 py-4')}>
+        {collapsed ? (
+          <p className="text-xs text-blue-400">2026</p>
+        ) : (
+          <>
+            <p className="text-xs text-blue-400">Loi de Finances 2026</p>
+            <p className="text-xs text-blue-500 mt-0.5">Fiscalité à jour</p>
+          </>
+        )}
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile top bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-14 bg-blue-900 text-white flex items-center px-4 z-50">
+        <button
+          onClick={() => setMobileOpen(true)}
+          className="p-2 rounded-lg hover:bg-blue-800 transition-colors"
+        >
+          <MenuIcon />
+        </button>
+        <h1 className="text-lg font-bold ml-3">PatriSim</h1>
+      </div>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-50"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <aside
+        className={clsx(
+          'lg:hidden fixed left-0 top-0 h-full w-72 bg-blue-900 text-white flex flex-col z-50 transition-transform duration-300',
+          mobileOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        {sidebarContent}
+      </aside>
+
+      {/* Desktop sidebar */}
+      <aside
+        className={clsx(
+          'hidden lg:flex fixed left-0 top-0 h-full bg-blue-900 text-white flex-col z-40 transition-all duration-300',
+          collapsed ? 'w-16' : 'w-64'
+        )}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }
