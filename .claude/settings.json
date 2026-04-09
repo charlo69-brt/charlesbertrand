@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // \"\"' | { read -r f; if echo \"$f\" | grep -q '/simulator/'; then cd /home/user/charlesbertrand/simulator && npm run lint 2>&1; fi; }",
+            "statusMessage": "Vérification ESLint...",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // \"\"' | { read -r cmd; if echo \"$cmd\" | grep -qE 'git commit'; then if ! (cd /home/user/charlesbertrand/simulator && npm run lint 2>&1 >&2); then echo '{\"continue\":false,\"stopReason\":\"Erreurs ESLint détectées. Corrigez les erreurs avant de committer.\"}'; fi; fi; }",
+            "statusMessage": "Vérification ESLint avant commit...",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
