@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patrimonio — Jeu de Gestion Immobilière</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/lobby.css">
 </head>
 <body>
@@ -70,6 +70,19 @@
       Rejoindre <span class="arrow">→</span>
     </button>
     <div id="join-error" class="error-msg"></div>
+  </div>
+</div>
+
+<!-- CHARACTER PICKER SCREEN -->
+<div id="screen-char" class="screen">
+  <div class="card-panel">
+    <h2 class="panel-title">Ton personnage</h2>
+    <p class="char-hint">Clique pour sélectionner</p>
+    <div class="char-grid" id="char-grid"></div>
+    <div id="char-error" class="error-msg"></div>
+    <button class="btn btn-primary full-width" id="btn-char-confirm" style="margin-top:20px" onclick="confirmCharacter()">
+      Rejoindre →
+    </button>
   </div>
 </div>
 

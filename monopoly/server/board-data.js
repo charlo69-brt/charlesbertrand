@@ -96,4 +96,19 @@ const COMMUNITY_CARDS = [
 const PLAYER_TOKENS = ['🏠','🚗','🎩','🐕','🛳️','⭐'];
 const PLAYER_COLORS = ['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6','#1abc9c'];
 
-module.exports = { BOARD, GROUP_COLORS, GROUP_SIZES, CHANCE_CARDS, COMMUNITY_CARDS, PLAYER_TOKENS, PLAYER_COLORS };
+const CHARACTERS = [
+  { id: 'char-lime',   color: '#84cc16' },
+  { id: 'char-yellow', color: '#eab308' },
+  { id: 'char-orange', color: '#f97316' },
+  { id: 'char-red',    color: '#ef4444' },
+  { id: 'char-blue',   color: '#3b82f6' },
+  { id: 'char-cyan',   color: '#06b6d4' },
+  { id: 'char-teal',   color: '#14b8a6' },
+  { id: 'char-green',  color: '#22c55e' },
+  { id: 'char-purple', color: '#a78bfa' },
+  { id: 'char-pink',   color: '#ec4899' },
+  { id: 'char-rose',   color: '#f43f5e' },
+  { id: 'char-violet', color: '#8b5cf6' },
+];
+
+module.exports = { BOARD, GROUP_COLORS, GROUP_SIZES, CHANCE_CARDS, COMMUNITY_CARDS, PLAYER_TOKENS, PLAYER_COLORS, CHARACTERS };

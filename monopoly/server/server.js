@@ -10,6 +10,8 @@ const {
   sendToJail, endTurn, checkWinner, checkBankruptcy, addLog, botTakeTurn,
 } = require('./game-logic');
 
+const { CHARACTERS } = require('./board-data');
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
@@ -166,10 +168,11 @@ function delay(ms) {
 }
 
 io.on('connection', (socket) => {
-  socket.on('createRoom', ({ playerName }) => {
+  socket.on('createRoom', ({ playerName, characterId }) => {
     const code = generateRoomCode();
     const game = createGame(code);
-    const player = createPlayer(socket.id, playerName, false, 0);
+    const charColor = CHARACTERS.find(c => c.id === characterId)?.color;
+    const player = createPlayer(socket.id, playerName, false, 0, charColor);
     game.players.push(player);
     rooms[code] = game;
     socket.join(code);
@@ -179,7 +182,7 @@ io.on('connection', (socket) => {
     broadcastGame(code);
   });
 
-  socket.on('joinRoom', ({ roomCode, playerName }) => {
+  socket.on('joinRoom', ({ roomCode, playerName, characterId }) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) { socket.emit('error', 'Salle introuvable'); return; }
@@ -187,7 +190,8 @@ io.on('connection', (socket) => {
     if (game.players.filter(p => !p.isBot).length >= 6) { socket.emit('error', 'Salle pleine'); return; }
 
     const tokenIndex = game.players.length;
-    const player = createPlayer(socket.id, playerName, false, tokenIndex);
+    const charColor = CHARACTERS.find(c => c.id === characterId)?.color;
+    const player = createPlayer(socket.id, playerName, false, tokenIndex, charColor);
     game.players.push(player);
     socket.join(code);
     socket.data.roomCode = code;
@@ -225,7 +229,10 @@ io.on('connection', (socket) => {
     const available = names.filter(n => !usedNames.includes(n));
     const name = available[0] || `Bot${game.players.length}`;
     const tokenIndex = game.players.length;
-    const bot = createPlayer('bot_' + uuidv4(), name, true, tokenIndex);
+    const usedColors = game.players.map(p => p.color);
+    const availChar = CHARACTERS.filter(c => !usedColors.includes(c.color));
+    const botChar = availChar[Math.floor(Math.random() * availChar.length)] || CHARACTERS[game.players.length % CHARACTERS.length];
+    const bot = createPlayer('bot_' + uuidv4(), name, true, tokenIndex, botChar.color);
     game.players.push(bot);
     addLog(game, `${name} (bot) rejoint la partie`, 'info');
     broadcastGame(code);
@@ -262,7 +269,12 @@ io.on('connection', (socket) => {
     const playerId = pid(socket);
     const player = game.players[game.currentPlayerIndex];
     if (!player || player.id !== playerId || player.bankrupt) return;
-    if (game.turnPhase !== 'roll') return;
+    const isDoublesReroll = game.turnPhase === 'action' &&
+      game.dice[0] === game.dice[1] &&
+      game.doublesCount > 0 && game.doublesCount < 3 &&
+      !game.pendingBuy;
+    if (game.turnPhase !== 'roll' && !isDoublesReroll) return;
+    if (isDoublesReroll) game.turnPhase = 'roll';
 
     const dice = rollDice();
     game.dice = dice;

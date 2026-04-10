@@ -30,13 +30,13 @@ function createGame(roomId) {
   };
 }
 
-function createPlayer(id, name, isBot, tokenIndex) {
+function createPlayer(id, name, isBot, tokenIndex, characterColor) {
   return {
     id,
     name,
     isBot,
-    token: PLAYER_TOKENS[tokenIndex % PLAYER_TOKENS.length],
-    color: PLAYER_COLORS[tokenIndex % PLAYER_COLORS.length],
+    token: '',
+    color: characterColor || PLAYER_COLORS[tokenIndex % PLAYER_COLORS.length],
     position: 0,
     money: 15000,
     inJail: false,
