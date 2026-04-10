@@ -82,43 +82,30 @@ function makeSquare(id, bandPos) {
 
   if (isCorner) {
     el.className = `sq sq-corner sq-${sq.type}`;
-    el.innerHTML = `
-      <div class="corner-in">
-        <span class="c-icon">${sq.icon||''}</span>
-        <span class="c-label">${sq.name}</span>
-        ${sq.sub ? `<span class="c-sub">${sq.sub}</span>` : ''}
-      </div>`;
+    el.innerHTML = `<div class="corner-in"><span class="c-icon">${sq.icon||''}</span><span class="c-label">${sq.name}</span>${sq.sub?`<span class="c-sub">${sq.sub}</span>`:''}</div>`;
     return el;
   }
 
-  const isProperty = sq.type === 'property' && sq.group;
   el.className = `sq sq-reg sq-bp-${bandPos}`;
-
-  // Color band (absolute positioned on outer edge)
-  if (isProperty) {
-    const band = document.createElement('div');
-    band.className = 'sq-band';
-    band.style.background = GROUP_COLORS[sq.group];
-    el.appendChild(band);
-  }
-
-  // Body (centered)
   const body = document.createElement('div');
   body.className = 'sq-body';
 
+  const isProperty = sq.type === 'property' && sq.group;
   if (isProperty) {
+    const color = GROUP_COLORS[sq.group];
     body.innerHTML = `
+      <div class="sq-group-dot" style="background:${color};box-shadow:0 2px 8px ${color}66"></div>
       <span class="sq-name">${sq.name}</span>
-      <span class="sq-price">${fmtK(sq.price)}</span>`;
+      <span class="sq-price-pill">${fmtK(sq.price)}</span>
+    `;
   } else {
-    // Special squares: railroad, utility, chance, community, tax
     body.innerHTML = `
       <span class="sq-icon">${sq.icon||''}</span>
-      <span class="sq-name sq-name-sm">${sq.name}</span>
-      ${sq.price ? `<span class="sq-price">${fmtK(sq.price)}</span>` : ''}
-      ${sq.sub   ? `<span class="sq-sub">${sq.sub}</span>`           : ''}`;
+      <span class="sq-name-sm">${sq.name}</span>
+      ${sq.price ? `<span class="sq-price-pill">${fmtK(sq.price)}</span>` : ''}
+      ${sq.sub   ? `<span class="sq-sub">${sq.sub}</span>`               : ''}
+    `;
   }
-
   el.appendChild(body);
   return el;
 }
@@ -250,9 +237,9 @@ function updateTokens(state) {
       tk = document.createElement('div');
       tk.className = 'board-token';
       tk.id = `tk-${player.id}`;
-      tk.textContent = player.token;
       board.appendChild(tk);
     }
+    tk.style.background = player.color;
     tk.style.left = `${c.x + offX}px`;
     tk.style.top  = `${c.y + offY}px`;
   });

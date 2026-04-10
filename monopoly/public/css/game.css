@@ -25,7 +25,7 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Nunito', system-ui, sans-serif;
   height: 100vh;
   overflow: hidden;
 }
@@ -292,11 +292,12 @@ aside {
 
 /* ═════ REGULAR SQUARES ═════ */
 .sq-reg {
-  background: #10102a;
+  background: linear-gradient(160deg, #1c1c35 0%, #0f0f22 100%);
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 /* TOP/BOTTOM rows: portrait cells */
@@ -311,89 +312,93 @@ aside {
   flex: 1;
 }
 
-/* ── Color band (thin strip on outer edge) ── */
-.sq-band {
-  position: absolute;
-  z-index: 1;
-  border-radius: 1px;
-}
-
-.sq-bp-top .sq-band {
-  top: 0; left: 0; right: 0;
-  height: 13px;
-}
-
-.sq-bp-bottom .sq-band {
-  bottom: 0; left: 0; right: 0;
-  height: 13px;
-}
-
-.sq-bp-left .sq-band {
-  left: 0; top: 0; bottom: 0;
-  width: 13px;
-}
-
-.sq-bp-right .sq-band {
-  right: 0; top: 0; bottom: 0;
-  width: 13px;
-}
-
-/* ── Square body (centered content) ── */
+/* ── Content wrapper ── */
 .sq-body {
-  position: relative;
-  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 2px 3px;
-  text-align: center;
+  justify-content: space-between;
+  padding: 6px 4px;
   width: 100%;
   height: 100%;
+  text-align: center;
   overflow: hidden;
 }
 
-/* City / property name */
+/* Side columns: rotate content to face outward */
+.sq-bp-left .sq-body {
+  width: var(--cell);
+  height: var(--corner);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+.sq-bp-right .sq-body {
+  width: var(--cell);
+  height: var(--corner);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* ── Group color indicator circle ── */
+.sq-group-dot {
+  width: calc(var(--cell) * 0.38);
+  height: calc(var(--cell) * 0.38);
+  border-radius: 50%;
+  flex-shrink: 0;
+  filter: brightness(1.1) saturate(1.1);
+}
+
+/* ── City / property name ── */
 .sq-name {
-  font-size: 8px;
+  font-size: clamp(6px, 0.85vw, 9px);
   font-weight: 700;
+  color: #fff;
   line-height: 1.2;
-  color: var(--text);
   text-align: center;
   word-break: break-word;
   hyphens: auto;
+  max-width: 100%;
 }
 
-/* Price */
-.sq-price {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 9px;
+/* ── Price badge ── */
+.sq-price-pill {
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-size: clamp(6px, 0.8vw, 8px);
   font-weight: 700;
-  color: rgba(255,255,255,.65);
-  text-align: center;
+  color: rgba(255,255,255,.75);
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: .04em;
+  flex-shrink: 0;
 }
 
-/* Special-square icon (railroad, utility, tax…) */
+/* ── Special-square icon ── */
 .sq-icon {
-  font-size: 15px;
+  font-size: clamp(14px, 1.8vw, 20px);
   line-height: 1;
   flex-shrink: 0;
 }
 
-/* Smaller name for special squares */
+/* ── Smaller name for special squares ── */
 .sq-name-sm {
-  font-size: 7px;
+  font-size: clamp(6px, 0.75vw, 8px);
   font-weight: 600;
-  color: var(--text);
-  text-align: center;
+  color: rgba(255,255,255,.85);
   line-height: 1.2;
+  text-align: center;
   word-break: break-word;
 }
 
-/* Sub-label (e.g. "2000€" on tax) */
+/* ── Sub-label ── */
 .sq-sub {
-  font-size: 7px;
+  font-size: clamp(6px, 0.7vw, 7px);
   color: var(--muted);
   text-align: center;
 }
@@ -435,16 +440,28 @@ aside {
 /* ═════ TOKENS ═════ */
 .board-token {
   position: absolute;
-  font-size: clamp(14px, 1.8vw, 22px);
   z-index: 20;
-  transition:
-    left .6s cubic-bezier(.34,1.56,.64,1),
-    top  .6s cubic-bezier(.34,1.56,.64,1);
+  width: clamp(18px, 2.5vw, 26px);
+  height: clamp(18px, 2.5vw, 26px);
+  border-radius: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,.9));
-  text-shadow: 0 0 10px rgba(255,255,255,.4);
+  transition: left .6s cubic-bezier(.34,1.56,.64,1), top .6s cubic-bezier(.34,1.56,.64,1);
+  box-shadow: 0 3px 10px rgba(0,0,0,.7), inset 0 -2px 5px rgba(0,0,0,.25), inset 0 1px 3px rgba(255,255,255,.3);
 }
+
+.board-token::before, .board-token::after {
+  content: '';
+  position: absolute;
+  width: 28%;
+  height: 28%;
+  background: #fff;
+  border-radius: 50%;
+  top: 28%;
+  box-shadow: inset 0 0 0 35% #1a1a2e;
+}
+.board-token::before { left: 16%; }
+.board-token::after  { right: 16%; }
 
 /* ═════ PLAYERS PANEL ═════ */
 #players-list {

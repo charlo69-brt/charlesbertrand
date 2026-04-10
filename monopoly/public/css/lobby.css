@@ -427,3 +427,74 @@ body {
   color: #3f3f5c;
   font-size: 14px;
 }
+
+/* ═════ CHARACTER PICKER ═════ */
+.char-hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.char-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  justify-items: center;
+}
+
+.char-option {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--char-color, #888);
+  cursor: pointer;
+  position: relative;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 14px rgba(0,0,0,.4), inset 0 -3px 6px rgba(0,0,0,.2), inset 0 1px 4px rgba(255,255,255,.25);
+}
+
+.char-option::before, .char-option::after {
+  content: '';
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  background: #fff;
+  border-radius: 50%;
+  top: 30%;
+  box-shadow: inset 0 0 0 3px #1a1a2e;
+}
+.char-option::before { left: 20%; }
+.char-option::after  { right: 20%; }
+
+.char-option:hover {
+  transform: scale(1.12) translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5), 0 0 0 3px rgba(255,255,255,.3);
+}
+
+.char-option.selected {
+  transform: scale(1.15) translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.5), 0 0 0 4px #fff, 0 0 0 6px var(--char-color);
+}
+
+/* Small avatar for lobby player list */
+.char-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--cc, #888);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,.4), inset 0 -2px 4px rgba(0,0,0,.15);
+}
+.char-avatar::before, .char-avatar::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  top: 30%;
+  box-shadow: inset 0 0 0 2px #1a1a2e;
+}
+.char-avatar::before { left: 20%; }
+.char-avatar::after  { right: 20%; }
