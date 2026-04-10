@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrimonio — Partie en cours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body>
+
+<!-- MAIN LAYOUT -->
+<div id="app">
+
+  <!-- LEFT SIDEBAR: Players -->
+  <aside id="sidebar-left">
+    <div class="sidebar-title">
+      <span class="logo-small">PATRIMONIO</span>
+    </div>
+    <div id="players-panel"></div>
+  </aside>
+
+  <!-- CENTER: Board -->
+  <main id="board-area">
+    <div id="board-container">
+      <canvas id="board-canvas"></canvas>
+      <div id="tokens-layer"></div>
+    </div>
+  </main>
+
+  <!-- RIGHT SIDEBAR: Actions + Log -->
+  <aside id="sidebar-right">
+    <div id="action-panel">
+      <div id="turn-info"></div>
+      <div id="dice-display">
+        <div class="die" id="die1">?</div>
+        <div class="die" id="die2">?</div>
+      </div>
+      <div id="action-buttons"></div>
+    </div>
+    <div id="log-panel">
+      <div class="log-title">Journal</div>
+      <div id="log-entries"></div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- PROPERTY MODAL -->
+<div id="modal-property" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-property')"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('modal-property')">✕</button>
+    <div id="modal-property-content"></div>
+  </div>
+</div>
+
+<!-- BUY MODAL -->
+<div id="modal-buy" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <div id="modal-buy-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="btn-buy-confirm">Acheter</button>
+      <button class="btn btn-ghost" id="btn-buy-decline">Passer</button>
+    </div>
+  </div>
+</div>
+
+<!-- CARD MODAL -->
+<div id="modal-card" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-card')"></div>
+  <div class="modal-box modal-card">
+    <div id="modal-card-content"></div>
+    <button class="btn btn-primary" onclick="closeModal('modal-card')">OK</button>
+  </div>
+</div>
+
+<!-- MANAGE PROPERTIES MODAL -->
+<div id="modal-manage" class="modal hidden">
+  <div class="modal-backdrop" onclick="closeModal('modal-manage')"></div>
+  <div class="modal-box modal-wide">
+    <button class="modal-close" onclick="closeModal('modal-manage')">✕</button>
+    <h3 class="modal-title">Gérer mes propriétés</h3>
+    <div id="modal-manage-content"></div>
+  </div>
+</div>
+
+<!-- WIN SCREEN -->
+<div id="screen-win" class="screen-overlay hidden">
+  <div class="win-card">
+    <div class="win-trophy">🏆</div>
+    <h2 id="win-title">Victoire !</h2>
+    <p id="win-subtitle"></p>
+    <button class="btn btn-primary" onclick="window.location.href='/'">Nouvelle partie</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/board-render.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

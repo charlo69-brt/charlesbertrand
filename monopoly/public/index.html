@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patrimonio — Jeu de Gestion Immobilière</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/lobby.css">
+</head>
+<body>
+
+<div id="bg-particles"></div>
+
+<!-- LANDING SCREEN -->
+<div id="screen-landing" class="screen active">
+  <div class="landing-hero">
+    <div class="logo-wrap">
+      <div class="logo-icon">🏙️</div>
+      <h1 class="logo-title">PATRIMONIO</h1>
+      <p class="logo-sub">Gestion de Patrimoine · Villes de France</p>
+    </div>
+    <div class="landing-buttons">
+      <button class="btn btn-primary" onclick="showScreen('screen-create')">
+        <span class="btn-icon">+</span> Créer une partie
+      </button>
+      <button class="btn btn-secondary" onclick="showScreen('screen-join')">
+        <span class="btn-icon">→</span> Rejoindre une partie
+      </button>
+    </div>
+    <div class="landing-features">
+      <div class="feature"><span>🏛️</span> 39 villes françaises</div>
+      <div class="feature"><span>👥</span> 2-6 joueurs</div>
+      <div class="feature"><span>🤖</span> Bots inclus</div>
+      <div class="feature"><span>⚡</span> Temps réel</div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE ROOM SCREEN -->
+<div id="screen-create" class="screen">
+  <div class="card-panel">
+    <button class="btn-back" onclick="showScreen('screen-landing')">← Retour</button>
+    <h2 class="panel-title">Nouvelle partie</h2>
+    <div class="form-group">
+      <label>Ton nom</label>
+      <input type="text" id="create-name" class="input-field" placeholder="Entre ton pseudo..." maxlength="20">
+    </div>
+    <button class="btn btn-primary full-width" onclick="createRoom()">
+      Créer la salle <span class="arrow">→</span>
+    </button>
+    <div id="create-error" class="error-msg"></div>
+  </div>
+</div>
+
+<!-- JOIN ROOM SCREEN -->
+<div id="screen-join" class="screen">
+  <div class="card-panel">
+    <button class="btn-back" onclick="showScreen('screen-landing')">← Retour</button>
+    <h2 class="panel-title">Rejoindre une partie</h2>
+    <div class="form-group">
+      <label>Code de la salle</label>
+      <input type="text" id="join-code" class="input-field input-code" placeholder="XXXXX" maxlength="5" style="text-transform:uppercase;letter-spacing:0.3em">
+    </div>
+    <div class="form-group">
+      <label>Ton nom</label>
+      <input type="text" id="join-name" class="input-field" placeholder="Entre ton pseudo..." maxlength="20">
+    </div>
+    <button class="btn btn-primary full-width" onclick="joinRoom()">
+      Rejoindre <span class="arrow">→</span>
+    </button>
+    <div id="join-error" class="error-msg"></div>
+  </div>
+</div>
+
+<!-- LOBBY SCREEN -->
+<div id="screen-lobby" class="screen">
+  <div class="lobby-wrap">
+    <div class="lobby-header">
+      <h2>Salle d'attente</h2>
+      <div class="room-code-display">
+        Code: <span id="lobby-code">-----</span>
+        <button class="btn-copy" onclick="copyCode()" title="Copier">📋</button>
+      </div>
+    </div>
+
+    <div class="lobby-content">
+      <div class="players-list" id="players-list"></div>
+
+      <div class="lobby-controls">
+        <div id="lobby-host-controls" style="display:none">
+          <button class="btn btn-ghost" onclick="addBot()">
+            🤖 Ajouter un bot
+          </button>
+          <button class="btn btn-primary" id="btn-start" onclick="startGame()">
+            Lancer la partie →
+          </button>
+        </div>
+        <div id="lobby-waiting-msg" class="waiting-msg">En attente du lancement...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/lobby.js"></script>
+</body>
+</html>
