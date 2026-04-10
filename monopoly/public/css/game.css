@@ -14,9 +14,10 @@
   --gold:   #f59e0b;
   --text:   #e8eaf6;
   --muted:  #6b7280;
-  /* Board */
-  --corner: 96px;
-  --cell:   64px;
+  /* Board — responsive: board fills available center space */
+  --board-w: min(calc(100vw - 420px), calc(100vh - 30px), 860px);
+  --corner:  calc(var(--board-w) / 8);
+  --cell:    calc(var(--board-w) / 12);
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
@@ -32,7 +33,7 @@ body {
 /* ═════ LAYOUT ═════ */
 #app {
   display: grid;
-  grid-template-columns: 220px 1fr 260px;
+  grid-template-columns: 180px 1fr 220px;
   height: 100vh;
 }
 
@@ -158,10 +159,9 @@ aside {
 }
 
 #board-outer {
-  max-width: min(calc(100vw - 500px), 750px);
-  max-height: calc(100vh - 20px);
-  aspect-ratio: 1;
-  width: 100%;
+  width: var(--board-w);
+  height: var(--board-w);
+  flex-shrink: 0;
 }
 
 /* ═════ BOARD GRID ═════ */
@@ -208,7 +208,7 @@ aside {
   overflow: hidden;
 }
 
-.center-name {
+.center-title {
   font-family: 'Rajdhani', sans-serif;
   font-size: clamp(22px, 3vw, 36px);
   font-weight: 700;
@@ -220,16 +220,11 @@ aside {
   text-align: center;
 }
 
-.center-desc {
+.center-sub {
   font-size: clamp(8px, 1vw, 12px);
   color: var(--muted);
   letter-spacing: .18em;
   text-transform: uppercase;
-}
-
-.center-flag {
-  font-size: clamp(24px, 3vw, 48px);
-  margin-top: 8px;
 }
 
 /* ═════ SQUARES — SHARED ═════ */
@@ -258,7 +253,7 @@ aside {
   justify-content: center;
 }
 
-.corner-inner {
+.corner-in {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -267,17 +262,17 @@ aside {
   padding: 6px;
 }
 
-.corner-icon { font-size: clamp(20px, 2.5vw, 32px); }
+.c-icon { font-size: clamp(22px, 2.8vw, 34px); }
 
-.corner-label {
+.c-label {
   font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(9px, 1vw, 13px);
+  font-size: clamp(9px, 1.1vw, 13px);
   font-weight: 700;
   letter-spacing: .06em;
   line-height: 1.1;
 }
 
-.corner-sub {
+.c-sub {
   font-size: clamp(7px, .8vw, 10px);
   opacity: .65;
   line-height: 1;
@@ -289,15 +284,19 @@ aside {
 .sq-parking  { background: linear-gradient(135deg, #1a1a0e, #25250e); }
 .sq-gotojail { background: linear-gradient(135deg, #2a0a0a, #350e0e); }
 
-.sq-go .corner-label   { color: #a78bfa; }
-.sq-go .corner-sub     { color: var(--green); font-weight: 600; opacity: 1; }
-.sq-jail .corner-label { color: #94a3b8; }
-.sq-gotojail .corner-label { color: var(--red); }
-.sq-parking .corner-sub { color: var(--gold); font-weight: 600; opacity: 1; }
+.sq-go .c-label       { color: #a78bfa; }
+.sq-go .c-sub         { color: var(--green); font-weight: 600; opacity: 1; }
+.sq-jail .c-label     { color: #94a3b8; }
+.sq-gotojail .c-label { color: var(--red); }
+.sq-parking .c-sub    { color: var(--gold); font-weight: 600; opacity: 1; }
 
 /* ═════ REGULAR SQUARES ═════ */
 .sq-reg {
   background: #10102a;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* TOP/BOTTOM rows: portrait cells */
@@ -306,106 +305,97 @@ aside {
   height: var(--corner);
 }
 
-/* LEFT/RIGHT cols: landscape cells, 1fr height */
+/* LEFT/RIGHT cols: landscape cells */
 .bcol .sq-reg {
   width: var(--corner);
   flex: 1;
 }
 
-/* Inner content container */
-.sq-inner {
-  width: 100%;
-  height: 100%;
+/* ── Color band (thin strip on outer edge) ── */
+.sq-band {
+  position: absolute;
+  z-index: 1;
+  border-radius: 1px;
+}
+
+.sq-bp-top .sq-band {
+  top: 0; left: 0; right: 0;
+  height: 13px;
+}
+
+.sq-bp-bottom .sq-band {
+  bottom: 0; left: 0; right: 0;
+  height: 13px;
+}
+
+.sq-bp-left .sq-band {
+  left: 0; top: 0; bottom: 0;
+  width: 13px;
+}
+
+.sq-bp-right .sq-band {
+  right: 0; top: 0; bottom: 0;
+  width: 13px;
+}
+
+/* ── Square body (centered content) ── */
+.sq-body {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 3px;
+  text-align: center;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
-/* Left col: rotate content 90° CW (read bottom→top) */
-.bcol-left .sq-inner {
-  transform: rotate(90deg);
-  transform-origin: center;
-}
-
-/* Right col: rotate content 90° CCW (read top→bottom) */
-.bcol-right .sq-inner {
-  transform: rotate(-90deg);
-  transform-origin: center;
-}
-
-/* ── Property squares ── */
-
-/* Colored header area (≈38% of square height) */
-.sq-header {
-  width: 100%;
-  flex: 0 0 38%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid rgba(0,0,0,.3);
-}
-
-.sq-hicon {
-  font-size: clamp(12px, 1.6vw, 20px);
-  filter: saturate(.9);
-}
-
-/* City name */
+/* City / property name */
 .sq-name {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: clamp(7px, .85vw, 10px);
+  font-size: 8px;
   font-weight: 700;
-  text-align: center;
-  padding: 2px 3px;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--text);
+  text-align: center;
+  word-break: break-word;
+  hyphens: auto;
 }
 
-/* Price pill */
+/* Price */
 .sq-price {
-  width: 100%;
-  flex: 0 0 auto;
-  text-align: center;
   font-family: 'Rajdhani', sans-serif;
-  font-size: clamp(8px, .9vw, 11px);
+  font-size: 9px;
   font-weight: 700;
-  color: #fff;
-  padding: 2px 0 3px;
+  color: rgba(255,255,255,.65);
+  text-align: center;
 }
 
-/* ── Non-property squares ── */
-.sq-type-chance    { background: linear-gradient(145deg, #2a1f08, #1a1505); }
-.sq-type-community { background: linear-gradient(145deg, #08202a, #051a20); }
-.sq-type-railroad  { background: linear-gradient(145deg, #0d1a14, #081510); }
-.sq-type-utility   { background: linear-gradient(145deg, #0d1a14, #081510); }
-.sq-type-tax       { background: linear-gradient(145deg, #200810, #1a050a); }
-
-.sq-icon-lg {
-  font-size: clamp(16px, 2vw, 26px);
-  flex: 0 0 auto;
-  margin-top: 8px;
+/* Special-square icon (railroad, utility, tax…) */
+.sq-icon {
+  font-size: 15px;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
-.sq-name-alt {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  font-size: clamp(7px, .8vw, 10px);
+/* Smaller name for special squares */
+.sq-name-sm {
+  font-size: 7px;
   font-weight: 600;
   color: var(--text);
   text-align: center;
-  padding: 0 4px;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
-.sq-price-alt {
-  font-size: clamp(7px, .7vw, 9px);
+/* Sub-label (e.g. "2000€" on tax) */
+.sq-sub {
+  font-size: 7px;
   color: var(--muted);
-  font-weight: 600;
-  padding-bottom: 4px;
+  text-align: center;
 }
 
 /* ═════ OVERLAYS ═════ */
@@ -422,16 +412,16 @@ aside {
 }
 
 /* Houses */
-.sq-houses-wrap {
+.sq-houses-w {
   position: absolute;
   top: 2px;
   right: 2px;
   display: flex;
   gap: 1px;
   z-index: 6;
+  font-size: clamp(6px, .9vw, 11px);
+  pointer-events: none;
 }
-
-.house-i { font-size: clamp(6px, .8vw, 10px); }
 
 /* Mortgaged hatching */
 .sq-mortgaged::after {
@@ -797,5 +787,5 @@ aside {
   #chat-panel { height:180px; border-right:none; border-bottom:1px solid var(--border); }
   #board-wrap { min-height:55vw; }
   #right-panel { border-left:none; border-top:1px solid var(--border); }
-  #board-outer { max-width:min(98vw,600px); }
+  #board-outer { max-width:min(98vw,680px); }
 }
