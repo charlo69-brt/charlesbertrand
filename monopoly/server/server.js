@@ -14,13 +14,18 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-// public/ is at monopoly/public/ — one level up from monopoly/server/
 const publicDir = path.resolve(__dirname, '..', 'public');
 app.use(express.static(publicDir));
 
-const rooms = {}; // roomCode -> game state
+const rooms = {};
 
-function getRoom(code) { return rooms[code.toUpperCase()]; }
+// Helper: get the effective player ID for this socket
+// After rejoin, socket.data.playerId holds the original persistent player ID
+function pid(socket) {
+  return socket.data.playerId || socket.id;
+}
+
+function getRoom(code) { return rooms[code?.toUpperCase()]; }
 
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -48,7 +53,7 @@ function sanitizeGame(game) {
     doublesCount: game.doublesCount,
     properties: game.properties,
     log: game.log.slice(0, 20),
-    auction: game.auction,
+    pendingBuy: game.pendingBuy,
     parkingPot: game.parkingPot,
     winner: game.winner,
   };
@@ -65,25 +70,27 @@ async function runBotTurn(code) {
 
   if (game.turnPhase !== 'roll') return;
 
-  // Roll dice
   const dice = rollDice();
   game.dice = dice;
   const diceSum = dice[0] + dice[1];
   const isDoubles = dice[0] === dice[1];
 
-  addLog(game, `${player.name} (bot) lance les dés : ${dice[0]} + ${dice[1]} = ${diceSum}`, 'info');
+  io.to(code).emit('diceRolled', { dice, playerId: player.id });
+  addLog(game, `${player.name} lance les dés : ${dice[0]} + ${dice[1]} = ${diceSum}`, 'info');
 
   if (player.inJail) {
     player.jailTurns++;
     if (isDoubles || player.jailTurns >= 3) {
       player.inJail = false;
       player.jailTurns = 0;
-      if (!isDoubles && player.jailTurns >= 3) {
+      if (!isDoubles) {
         player.money -= 500;
         addLog(game, `${player.name} paie 500€ pour sortir de prison`, 'warning');
+      } else {
+        addLog(game, `${player.name} sort de prison avec un double !`, 'success');
       }
     } else {
-      addLog(game, `${player.name} reste en prison (tour ${player.jailTurns}/3)`, 'info');
+      addLog(game, `${player.name} reste en prison (${player.jailTurns}/3)`, 'info');
       broadcastGame(code);
       game.turnPhase = 'end';
       await delay(800);
@@ -108,35 +115,33 @@ async function runBotTurn(code) {
     game.doublesCount = 0;
   }
 
+  await delay(600);
   advancePlayer(game, player, diceSum);
   broadcastGame(code);
 
-  await delay(800);
-
+  await delay(600);
   const events = handleLanding(game, player, diceSum);
   broadcastGame(code);
 
-  // Handle buy decision
   const canBuyEvent = events.find(e => e.type === 'canBuy');
   if (canBuyEvent && player.money >= canBuyEvent.square.price) {
-    await delay(600);
+    await delay(500);
     buyProperty(game, player.id, canBuyEvent.square.id);
   }
 
-  // Bot extra actions
-  await delay(600);
+  await delay(400);
   const actions = botTakeTurn(game, player);
   for (const action of actions) {
     if (action.type === 'buildHouse') {
       buildHouse(game, player.id, action.squareId);
-      await delay(300);
+      await delay(200);
     }
   }
 
   broadcastGame(code);
 
   if (isDoubles && !player.inJail && game.doublesCount < 3) {
-    await delay(800);
+    await delay(1000);
     runBotTurn(code);
   } else {
     game.turnPhase = 'end';
@@ -152,7 +157,7 @@ function scheduleNextBotTurn(code) {
   if (!game || game.phase !== 'playing') return;
   const player = game.players[game.currentPlayerIndex];
   if (player && player.isBot && !player.bankrupt) {
-    setTimeout(() => runBotTurn(code), 1000);
+    setTimeout(() => runBotTurn(code), 1200);
   }
 }
 
@@ -161,8 +166,6 @@ function delay(ms) {
 }
 
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
   socket.on('createRoom', ({ playerName }) => {
     const code = generateRoomCode();
     const game = createGame(code);
@@ -193,14 +196,34 @@ io.on('connection', (socket) => {
     broadcastGame(code);
   });
 
-  socket.on('addBot', ({ roomCode, botName }) => {
+  socket.on('rejoinRoom', ({ roomCode, playerId }) => {
+    const code = roomCode?.toUpperCase();
+    const game = getRoom(code);
+    if (!game) { socket.emit('error', 'Salle introuvable'); return; }
+
+    socket.join(code);
+    socket.data.roomCode = code;
+    socket.data.playerId = playerId; // Keep original player ID
+
+    const player = game.players.find(p => p.id === playerId);
+    if (player) {
+      player.connected = true;
+    }
+    // Tell client their confirmed player ID
+    socket.emit('identityConfirmed', { playerId });
+    broadcastGame(code);
+  });
+
+  socket.on('addBot', ({ roomCode }) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game || game.phase !== 'lobby') return;
     if (game.players.length >= 6) { socket.emit('error', 'Maximum 6 joueurs'); return; }
 
-    const names = ['MaxBot', 'AlphaBot', 'RoboGest', 'PatriBot', 'WealthBot'];
-    const name = botName || names[Math.floor(Math.random() * names.length)];
+    const names = ['MaxBot', 'AlphaBot', 'RoboGest', 'PatriBot', 'WealthBot', 'InvestBot'];
+    const usedNames = game.players.map(p => p.name);
+    const available = names.filter(n => !usedNames.includes(n));
+    const name = available[0] || `Bot${game.players.length}`;
     const tokenIndex = game.players.length;
     const bot = createPlayer('bot_' + uuidv4(), name, true, tokenIndex);
     game.players.push(bot);
@@ -222,15 +245,12 @@ io.on('connection', (socket) => {
     if (!game || game.phase !== 'lobby') return;
     if (game.players.length < 2) { socket.emit('error', 'Il faut au moins 2 joueurs'); return; }
 
-    // Shuffle player order
     game.players.sort(() => Math.random() - 0.5);
     game.phase = 'playing';
     game.currentPlayerIndex = 0;
     game.turnPhase = 'roll';
-    addLog(game, 'La partie commence !', 'success');
+    addLog(game, 'La partie commence ! Bonne chance à tous !', 'success');
     broadcastGame(code);
-
-    // Start bot turn if first player is a bot
     scheduleNextBotTurn(code);
   });
 
@@ -239,8 +259,9 @@ io.on('connection', (socket) => {
     const game = getRoom(code);
     if (!game || game.phase !== 'playing') return;
 
+    const playerId = pid(socket);
     const player = game.players[game.currentPlayerIndex];
-    if (player.id !== socket.id || player.bankrupt) return;
+    if (!player || player.id !== playerId || player.bankrupt) return;
     if (game.turnPhase !== 'roll') return;
 
     const dice = rollDice();
@@ -248,6 +269,7 @@ io.on('connection', (socket) => {
     const diceSum = dice[0] + dice[1];
     const isDoubles = dice[0] === dice[1];
 
+    io.to(code).emit('diceRolled', { dice, playerId: player.id });
     addLog(game, `${player.name} lance les dés : ${dice[0]} + ${dice[1]} = ${diceSum}`, 'info');
 
     if (player.inJail) {
@@ -287,16 +309,12 @@ io.on('connection', (socket) => {
     game.turnPhase = 'action';
 
     const canBuyEvent = events.find(e => e.type === 'canBuy');
-    if (canBuyEvent) {
-      game.pendingBuy = { squareId: canBuyEvent.square.id, playerId: player.id };
-    } else {
-      game.pendingBuy = null;
-    }
+    game.pendingBuy = canBuyEvent
+      ? { squareId: canBuyEvent.square.id, playerId: player.id }
+      : null;
 
     const cardEvent = events.find(e => e.type === 'card');
-    if (cardEvent) {
-      io.to(code).emit('cardDrawn', cardEvent);
-    }
+    if (cardEvent) io.to(code).emit('cardDrawn', cardEvent);
 
     checkWinner(game);
     broadcastGame(code);
@@ -306,10 +324,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    const player = game.players.find(p => p.id === socket.id);
-    if (!player) return;
-
-    buyProperty(game, socket.id, squareId);
+    buyProperty(game, pid(socket), squareId);
     game.pendingBuy = null;
     broadcastGame(code);
   });
@@ -326,7 +341,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    buildHouse(game, socket.id, squareId);
+    buildHouse(game, pid(socket), squareId);
     broadcastGame(code);
   });
 
@@ -334,7 +349,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    sellHouse(game, socket.id, squareId);
+    sellHouse(game, pid(socket), squareId);
     broadcastGame(code);
   });
 
@@ -342,7 +357,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    mortgageProperty(game, socket.id, squareId);
+    mortgageProperty(game, pid(socket), squareId);
     broadcastGame(code);
   });
 
@@ -350,7 +365,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    unmortgageProperty(game, socket.id, squareId);
+    unmortgageProperty(game, pid(socket), squareId);
     broadcastGame(code);
   });
 
@@ -358,7 +373,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    const player = game.players.find(p => p.id === socket.id);
+    const player = game.players.find(p => p.id === pid(socket));
     if (!player || !player.inJail) return;
     if (player.money < 500) { socket.emit('error', 'Fonds insuffisants'); return; }
     player.money -= 500;
@@ -372,7 +387,7 @@ io.on('connection', (socket) => {
     const code = roomCode.toUpperCase();
     const game = getRoom(code);
     if (!game) return;
-    const player = game.players.find(p => p.id === socket.id);
+    const player = game.players.find(p => p.id === pid(socket));
     if (!player || !player.inJail || player.jailFreeCards <= 0) return;
     player.jailFreeCards--;
     player.inJail = false;
@@ -386,11 +401,11 @@ io.on('connection', (socket) => {
     const game = getRoom(code);
     if (!game || game.phase !== 'playing') return;
     const player = game.players[game.currentPlayerIndex];
-    if (player.id !== socket.id) return;
+    if (!player || player.id !== pid(socket)) return;
     if (game.turnPhase === 'roll') return;
 
-    // Allow re-roll on doubles
-    if (game.dice[0] === game.dice[1] && game.doublesCount > 0 && !player.inJail) {
+    const isDoubles = game.dice[0] === game.dice[1];
+    if (isDoubles && !player.inJail && game.doublesCount > 0 && game.doublesCount < 3) {
       game.turnPhase = 'roll';
       broadcastGame(code);
       return;
@@ -401,30 +416,29 @@ io.on('connection', (socket) => {
     scheduleNextBotTurn(code);
   });
 
-  socket.on('rejoinRoom', ({ roomCode, playerId }) => {
+  // Chat
+  socket.on('chatMessage', ({ roomCode, message }) => {
     const code = roomCode?.toUpperCase();
     const game = getRoom(code);
-    if (!game) { socket.emit('error', 'Salle introuvable'); return; }
-
-    // Re-attach socket to room channel
-    socket.join(code);
-    socket.data.roomCode = code;
-    socket.data.playerId = playerId;
-
-    // Reassign socket id if player reconnects (same playerId stored in session)
-    const player = game.players.find(p => p.id === playerId);
-    if (player) {
-      player.connected = true;
-      addLog(game, `${player.name} s'est reconnecté`, 'info');
-    }
-    broadcastGame(code);
+    if (!game) return;
+    const player = game.players.find(p => p.id === pid(socket));
+    if (!player) return;
+    const text = String(message).trim().slice(0, 200);
+    if (!text) return;
+    io.to(code).emit('chatMessage', {
+      playerId: player.id,
+      playerName: player.name,
+      playerColor: player.color,
+      text,
+      time: Date.now(),
+    });
   });
 
   socket.on('disconnect', () => {
     const code = socket.data?.roomCode;
     const game = code ? getRoom(code) : null;
     if (game) {
-      const player = game.players.find(p => p.id === socket.id);
+      const player = game.players.find(p => p.id === pid(socket));
       if (player) {
         player.connected = false;
         addLog(game, `${player.name} s'est déconnecté`, 'warning');

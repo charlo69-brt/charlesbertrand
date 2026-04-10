@@ -3,102 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patrimonio — Partie en cours</title>
+<title>Patrimonio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
 
-<!-- MAIN LAYOUT -->
 <div id="app">
 
-  <!-- LEFT SIDEBAR: Players -->
-  <aside id="sidebar-left">
-    <div class="sidebar-title">
-      <span class="logo-small">PATRIMONIO</span>
+  <!-- LEFT: Chat -->
+  <aside id="chat-panel">
+    <div class="panel-header">
+      <span class="panel-logo">PATRIMONIO</span>
+      <span id="room-code-badge"></span>
     </div>
-    <div id="players-panel"></div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-wrap">
+      <input type="text" id="chat-input" placeholder="Message..." maxlength="200" autocomplete="off">
+      <button id="chat-send" onclick="sendChat()">↑</button>
+    </div>
   </aside>
 
   <!-- CENTER: Board -->
-  <main id="board-area">
-    <div id="board-container">
-      <canvas id="board-canvas"></canvas>
-      <div id="tokens-layer"></div>
+  <main id="board-wrap">
+    <div id="board-outer">
+      <div id="board"></div>
     </div>
   </main>
 
-  <!-- RIGHT SIDEBAR: Actions + Log -->
-  <aside id="sidebar-right">
-    <div id="action-panel">
-      <div id="turn-info"></div>
-      <div id="dice-display">
-        <div class="die" id="die1">?</div>
-        <div class="die" id="die2">?</div>
+  <!-- RIGHT: Players + Actions -->
+  <aside id="right-panel">
+
+    <!-- Players list -->
+    <div id="players-list"></div>
+
+    <!-- Divider -->
+    <div class="panel-divider"></div>
+
+    <!-- Actions -->
+    <div id="action-area">
+      <div id="turn-label"></div>
+
+      <!-- Dice -->
+      <div id="dice-wrap">
+        <div class="die" id="die-0"><div class="die-inner"></div></div>
+        <div class="die" id="die-1"><div class="die-inner"></div></div>
       </div>
-      <div id="action-buttons"></div>
+      <div id="dice-total"></div>
+
+      <!-- Buttons -->
+      <div id="action-btns"></div>
     </div>
-    <div id="log-panel">
-      <div class="log-title">Journal</div>
-      <div id="log-entries"></div>
-    </div>
+
   </aside>
 
 </div>
 
-<!-- PROPERTY MODAL -->
-<div id="modal-property" class="modal hidden">
-  <div class="modal-backdrop" onclick="closeModal('modal-property')"></div>
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('modal-property')">✕</button>
-    <div id="modal-property-content"></div>
-  </div>
-</div>
-
-<!-- BUY MODAL -->
+<!-- MODAL: Buy property -->
 <div id="modal-buy" class="modal hidden">
-  <div class="modal-backdrop"></div>
+  <div class="modal-overlay" onclick="closeBuyModal()"></div>
   <div class="modal-box">
-    <div id="modal-buy-content"></div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" id="btn-buy-confirm">Acheter</button>
-      <button class="btn btn-ghost" id="btn-buy-decline">Passer</button>
+    <div id="modal-buy-body"></div>
+    <div class="modal-row">
+      <button class="btn btn-primary" id="btn-buy-yes">Acheter</button>
+      <button class="btn btn-ghost" onclick="emit('declineBuy'); closeBuyModal()">Passer</button>
     </div>
   </div>
 </div>
 
-<!-- CARD MODAL -->
+<!-- MODAL: Property details -->
+<div id="modal-prop" class="modal hidden">
+  <div class="modal-overlay" onclick="closeModal('modal-prop')"></div>
+  <div class="modal-box">
+    <button class="btn-close" onclick="closeModal('modal-prop')">✕</button>
+    <div id="modal-prop-body"></div>
+  </div>
+</div>
+
+<!-- MODAL: Card drawn -->
 <div id="modal-card" class="modal hidden">
-  <div class="modal-backdrop" onclick="closeModal('modal-card')"></div>
-  <div class="modal-box modal-card">
-    <div id="modal-card-content"></div>
-    <button class="btn btn-primary" onclick="closeModal('modal-card')">OK</button>
+  <div class="modal-overlay" onclick="closeModal('modal-card')"></div>
+  <div class="modal-box modal-card-box">
+    <div id="modal-card-body"></div>
+    <button class="btn btn-primary" onclick="closeModal('modal-card')">Compris</button>
   </div>
 </div>
 
-<!-- MANAGE PROPERTIES MODAL -->
+<!-- MODAL: Manage properties -->
 <div id="modal-manage" class="modal hidden">
-  <div class="modal-backdrop" onclick="closeModal('modal-manage')"></div>
+  <div class="modal-overlay" onclick="closeModal('modal-manage')"></div>
   <div class="modal-box modal-wide">
-    <button class="modal-close" onclick="closeModal('modal-manage')">✕</button>
+    <button class="btn-close" onclick="closeModal('modal-manage')">✕</button>
     <h3 class="modal-title">Gérer mes propriétés</h3>
-    <div id="modal-manage-content"></div>
+    <div id="modal-manage-body"></div>
   </div>
 </div>
 
-<!-- WIN SCREEN -->
-<div id="screen-win" class="screen-overlay hidden">
-  <div class="win-card">
+<!-- WIN OVERLAY -->
+<div id="win-screen" class="hidden">
+  <div class="win-box">
     <div class="win-trophy">🏆</div>
-    <h2 id="win-title">Victoire !</h2>
-    <p id="win-subtitle"></p>
+    <h2 id="win-title"></h2>
+    <p id="win-sub"></p>
     <button class="btn btn-primary" onclick="window.location.href='/'">Nouvelle partie</button>
   </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="js/board-render.js"></script>
+<script src="js/board.js"></script>
 <script src="js/game.js"></script>
 </body>
 </html>
