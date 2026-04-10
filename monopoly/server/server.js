@@ -14,7 +14,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
-app.use(express.static(path.join(__dirname, '../public')));
+// public/ is at monopoly/public/ — one level up from monopoly/server/
+const publicDir = path.resolve(__dirname, '..', 'public');
+app.use(express.static(publicDir));
 
 const rooms = {}; // roomCode -> game state
 
