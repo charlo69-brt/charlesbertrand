@@ -10,6 +10,7 @@ interface ClientSubNavProps {
 
 const tabs = [
   { id: 'fiche', label: 'Fiche client', path: '' },
+  { id: 'famille', label: 'Famille', path: '/famille' },
   { id: 'bilan', label: 'Bilan patrimonial', path: '/bilan' },
   { id: 'fiscalite', label: 'Fiscalité', path: '/fiscalite' },
   { id: 'investissements', label: 'Investissements', path: '/investissements' },

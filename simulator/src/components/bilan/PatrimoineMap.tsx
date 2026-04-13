@@ -134,6 +134,13 @@ export default function PatrimoineMap(props: PatrimoineMapProps) {
       items: buildImmoItems(actifs.immobilier, 'residence_principale'),
     });
   }
+  if (detailImmo.residence_secondaire > 0) {
+    actifTiles.push({
+      emoji: '🏖️', label: 'Résidence secondaire', montant: detailImmo.residence_secondaire,
+      color: 'text-sky-700', bgColor: 'bg-sky-50', borderColor: 'border-sky-200',
+      items: buildImmoItems(actifs.immobilier, 'residence_secondaire'),
+    });
+  }
   if (detailImmo.locatif > 0) {
     actifTiles.push({
       emoji: '🏢', label: 'Immobilier locatif', montant: detailImmo.locatif,

@@ -1,7 +1,8 @@
 'use client';
 
-import { Actifs, BienImmobilier, ActifFinancier, ActifProfessionnel, ModeDetention } from '@/lib/types';
-import { generateId } from '@/lib/utils';
+import { Actifs, BienImmobilier, ActifFinancier, ActifProfessionnel, ModeDetention, SituationFamiliale, RegimeMatrimonial } from '@/lib/types';
+import { generateId, getRegimeLabel } from '@/lib/utils';
+import { getDefaultDetention } from '@/lib/calculs/regime-matrimonial';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import NumberInput from '@/components/ui/NumberInput';
@@ -11,10 +12,13 @@ import Card from '@/components/ui/Card';
 interface ActifsFormProps {
   actifs: Actifs;
   onChange: (actifs: Actifs) => void;
+  situationFamiliale?: SituationFamiliale;
+  regimeMatrimonial?: RegimeMatrimonial;
 }
 
 const typeBienOptions = [
   { value: 'residence_principale', label: 'Résidence principale' },
+  { value: 'residence_secondaire', label: 'Résidence secondaire' },
   { value: 'locatif', label: 'Bien locatif' },
   { value: 'scpi', label: 'SCPI' },
 ];
@@ -38,12 +42,16 @@ const detentionOptions = [
   { value: 'indivision', label: '🤝 Indivision' },
 ];
 
-export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
+export default function ActifsForm({ actifs, onChange, situationFamiliale, regimeMatrimonial }: ActifsFormProps) {
+  const defaultDetention = getDefaultDetention(regimeMatrimonial, situationFamiliale);
+  const isCouple = situationFamiliale === 'marie' || situationFamiliale === 'pacse';
+
   const addImmobilier = () => {
     onChange({
       ...actifs,
       immobilier: [...actifs.immobilier, {
         id: generateId(), label: '', type: 'residence_principale', valeur: 0,
+        detention: isCouple ? defaultDetention : undefined,
       }],
     });
   };
@@ -64,6 +72,7 @@ export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
       ...actifs,
       financier: [...actifs.financier, {
         id: generateId(), label: '', type: 'compte_courant', valeur: 0,
+        detention: isCouple ? defaultDetention : undefined,
       }],
     });
   };
@@ -99,6 +108,14 @@ export default function ActifsForm({ actifs, onChange }: ActifsFormProps) {
 
   return (
     <div className="space-y-6">
+      {isCouple && regimeMatrimonial && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800 flex items-center gap-2">
+          <span>👫</span>
+          <span>
+            Régime : <strong>{getRegimeLabel(regimeMatrimonial)}</strong> — les nouveaux biens sont automatiquement en mode <strong>{defaultDetention === 'commun' ? 'communauté' : 'bien propre'}</strong>. Vous pouvez modifier individuellement.
+          </span>
+        </div>
+      )}
       {/* Immobilier */}
       <Card title="Actifs immobiliers" action={<Button size="sm" onClick={addImmobilier}>+ Ajouter</Button>}>
         {actifs.immobilier.length === 0 ? (

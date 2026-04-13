@@ -116,6 +116,13 @@ export const BAREME_USUFRUIT_FISCAL = [
   { ageMin: 91, ageMax: Infinity, usufruit: 0.10 },
 ];
 
+// Réserve héréditaire et quotité disponible
+export const RESERVE_HEREDITAIRE = [
+  { enfants: 1, reserve: 0.5, quotiteDisponible: 0.5 },
+  { enfants: 2, reserve: 2 / 3, quotiteDisponible: 1 / 3 },
+  { enfants: 3, reserve: 0.75, quotiteDisponible: 0.25 },
+];
+
 // Parts fiscales
 export const PARTS_FISCALES = {
   celibataire: 1,

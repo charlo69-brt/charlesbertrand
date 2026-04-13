@@ -71,10 +71,21 @@ export function getRegimeLabel(regime: string): string {
 export function getTypeBienLabel(type: string): string {
   const labels: Record<string, string> = {
     residence_principale: 'Résidence principale',
+    residence_secondaire: 'Résidence secondaire',
     locatif: 'Bien locatif',
     scpi: 'SCPI',
   };
   return labels[type] || type;
+}
+
+export function getLienParenteLabel(lien: string): string {
+  const labels: Record<string, string> = {
+    conjoint: 'Conjoint',
+    enfant: 'Enfant',
+    parent: 'Parent',
+    frere_soeur: 'Frère/Soeur',
+  };
+  return labels[lien] || lien;
 }
 
 export function getTypeActifFinancierLabel(type: string): string {

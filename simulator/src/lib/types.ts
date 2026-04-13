@@ -1,9 +1,28 @@
 // ============ ENUMS ============
 export type SituationFamiliale = 'celibataire' | 'marie' | 'pacse' | 'divorce' | 'veuf';
 export type RegimeMatrimonial = 'communaute_legale' | 'separation_biens' | 'communaute_universelle' | 'participation_acquets';
-export type TypeBienImmobilier = 'residence_principale' | 'locatif' | 'scpi';
+export type TypeBienImmobilier = 'residence_principale' | 'residence_secondaire' | 'locatif' | 'scpi';
 export type TypeActifFinancier = 'compte_courant' | 'livret' | 'assurance_vie' | 'per' | 'pea' | 'cto';
 export type ModeDetention = 'propre' | 'commun' | 'sci' | 'demembrement_np' | 'demembrement_usu' | 'indivision';
+export type LienParente = 'conjoint' | 'enfant' | 'parent' | 'frere_soeur';
+
+// ============ FAMILLE ============
+export interface MembreFamille {
+  id: string;
+  prenom: string;
+  nom?: string;
+  dateNaissance: string;
+  lien: LienParente;
+  estACharge?: boolean;
+}
+
+// ============ DMTG ============
+export type OptionConjoint =
+  | 'usufruit_totalite'
+  | 'quart_pleine_propriete'
+  | 'quotite_disponible_pp'
+  | 'quart_pp_trois_quarts_usu'
+  | 'usufruit_totalite_ddv';
 
 // ============ CLIENT ============
 export interface Client {
@@ -15,6 +34,7 @@ export interface Client {
   regimeMatrimonial?: RegimeMatrimonial;
   nombreEnfants: number;
   enfantsACharge: number;
+  membres?: MembreFamille[];
   email?: string;
   telephone?: string;
   adresse?: string;

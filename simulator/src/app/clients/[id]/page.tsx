@@ -64,6 +64,10 @@ export default function ClientDetailPage() {
               <div><span className="text-gray-500">Prénom :</span> <span className="font-medium">{client.prenom}</span></div>
               <div><span className="text-gray-500">Date de naissance :</span> <span className="font-medium">{client.dateNaissance ? new Date(client.dateNaissance).toLocaleDateString('fr-FR') : '-'}</span></div>
               <div><span className="text-gray-500">Profession :</span> <span className="font-medium">{client.profession || '-'}</span></div>
+              <div><span className="text-gray-500">Situation :</span> <span className="font-medium">{client.situationFamiliale === 'marie' ? 'Marié(e)' : client.situationFamiliale === 'pacse' ? 'Pacsé(e)' : client.situationFamiliale === 'divorce' ? 'Divorcé(e)' : client.situationFamiliale === 'veuf' ? 'Veuf/Veuve' : 'Célibataire'}</span></div>
+              <div><span className="text-gray-500">Régime :</span> <span className="font-medium">{client.regimeMatrimonial ? (client.regimeMatrimonial === 'communaute_legale' ? 'Communauté légale' : client.regimeMatrimonial === 'separation_biens' ? 'Séparation de biens' : client.regimeMatrimonial === 'communaute_universelle' ? 'Communauté universelle' : 'Participation aux acquêts') : '-'}</span></div>
+              <div><span className="text-gray-500">Enfants :</span> <span className="font-medium">{client.nombreEnfants} ({client.enfantsACharge} à charge)</span></div>
+              <div><span className="text-gray-500">Famille :</span> <span className="font-medium">{(client.membres || []).length} membre(s) renseigné(s)</span></div>
               <div><span className="text-gray-500">Email :</span> <span className="font-medium">{client.email || '-'}</span></div>
               <div><span className="text-gray-500">Téléphone :</span> <span className="font-medium">{client.telephone || '-'}</span></div>
               <div className="md:col-span-2"><span className="text-gray-500">Adresse :</span> <span className="font-medium">{client.adresse || '-'}</span></div>

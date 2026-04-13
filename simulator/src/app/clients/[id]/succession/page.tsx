@@ -10,9 +10,11 @@ import Tabs from '@/components/ui/Tabs';
 import Button from '@/components/ui/Button';
 import SuccessionSimulator from '@/components/succession/SuccessionSimulator';
 import DemembrementTable from '@/components/succession/DemembrementTable';
+import DMTGCalculator from '@/components/succession/DMTGCalculator';
 
 const tabs = [
-  { id: 'succession', label: 'Succession' },
+  { id: 'dmtg', label: 'DMTG & Conjoint' },
+  { id: 'succession', label: 'Succession libre' },
   { id: 'demembrement', label: 'Démembrement' },
 ];
 
@@ -21,8 +23,8 @@ export default function SuccessionPage() {
   const router = useRouter();
   const clientId = params.id as string;
   const { getClient } = useClients();
-  const { patrimoineNet } = useBilan(clientId);
-  const [activeTab, setActiveTab] = useState('succession');
+  const { patrimoineNet, totalPassifs, bilan } = useBilan(clientId);
+  const [activeTab, setActiveTab] = useState('dmtg');
 
   const client = getClient(clientId);
 
@@ -43,6 +45,18 @@ export default function SuccessionPage() {
       <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
       <div className="mt-6">
+        {activeTab === 'dmtg' && (
+          <DMTGCalculator
+            client={client}
+            patrimoine={patrimoineNet}
+            passifs={totalPassifs}
+            actifs={[
+              ...bilan.actifs.immobilier.map(b => ({ valeur: b.valeur, detention: b.detention })),
+              ...bilan.actifs.financier.map(a => ({ valeur: a.valeur, detention: a.detention })),
+              ...bilan.actifs.professionnel.map(a => ({ valeur: a.valeur, detention: a.detention })),
+            ]}
+          />
+        )}
         {activeTab === 'succession' && <SuccessionSimulator patrimoine={patrimoineNet} />}
         {activeTab === 'demembrement' && <DemembrementTable />}
       </div>

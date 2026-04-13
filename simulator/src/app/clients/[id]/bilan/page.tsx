@@ -69,7 +69,7 @@ export default function BilanPage() {
             totalCharges={totalCharges}
           />
         )}
-        {activeTab === 'actifs' && <ActifsForm actifs={bilan.actifs} onChange={updateActifs} />}
+        {activeTab === 'actifs' && <ActifsForm actifs={bilan.actifs} onChange={updateActifs} situationFamiliale={client.situationFamiliale} regimeMatrimonial={client.regimeMatrimonial} />}
         {activeTab === 'passifs' && <PassifsForm passifs={bilan.passifs} onChange={updatePassifs} />}
         {activeTab === 'revenus' && <RevenusForm revenus={bilan.revenus} onChange={updateRevenus} />}
         {activeTab === 'charges' && <ChargesForm charges={bilan.charges} onChange={updateCharges} />}
